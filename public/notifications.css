@@ -1,0 +1,300 @@
+/* Стили для системы уведомлений */
+
+.notifications-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+    max-width: 400px;
+    width: calc(100% - 40px);
+}
+
+.notification {
+    position: relative;
+    background: linear-gradient(135deg, rgba(47, 48, 53, 1) 0%, rgba(31, 31, 31, 1) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transform: translateX(400px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: auto;
+    overflow: hidden;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification.hide {
+    opacity: 0;
+    transform: translateX(400px);
+}
+
+.notification-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+}
+
+.notification-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.notification-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-message {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #ffffff;
+    font-weight: 400;
+    letter-spacing: -0.2px;
+}
+
+.notification-close {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.6);
+    transition: all 0.2s ease;
+    padding: 0;
+    margin: 0;
+    border-radius: 4px;
+}
+
+.notification-close:hover {
+    color: rgba(255, 255, 255, 1);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.notification-close svg {
+    width: 16px;
+    height: 16px;
+}
+
+.notification-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.3);
+    transform-origin: left;
+    transform: scaleX(0);
+}
+
+@keyframes notification-progress {
+    to {
+        transform: scaleX(1);
+    }
+}
+
+/* Типы уведомлений */
+.notification-success {
+    border-left: 3px solid #4CAF50;
+}
+
+.notification-success .notification-icon {
+    color: #4CAF50;
+}
+
+.notification-error {
+    border-left: 3px solid #f44336;
+}
+
+.notification-error .notification-icon {
+    color: #f44336;
+}
+
+.notification-warning {
+    border-left: 3px solid #ff9800;
+}
+
+.notification-warning .notification-icon {
+    color: #ff9800;
+}
+
+.notification-info {
+    border-left: 3px solid #2196F3;
+}
+
+.notification-info .notification-icon {
+    color: #2196F3;
+}
+
+/* Подтверждение */
+.notification-confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: auto;
+}
+
+.notification-confirm-overlay.show {
+    opacity: 1;
+}
+
+.notification-confirm {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    z-index: 10000;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: auto;
+}
+
+.notification-confirm.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.notification-confirm.hide {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+}
+
+.notification-confirm-content {
+    background: linear-gradient(135deg, rgba(47, 48, 53, 1) 0%, rgba(31, 31, 31, 1) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 32px;
+    min-width: 320px;
+    max-width: 480px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+}
+
+.notification-confirm-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff9800;
+}
+
+.notification-confirm-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.notification-confirm-message {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 24px;
+    font-weight: 400;
+    letter-spacing: -0.2px;
+}
+
+.notification-confirm-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.notification-confirm-btn {
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+    font-family: 'TTHoves', Arial, sans-serif;
+    letter-spacing: -0.3px;
+}
+
+.notification-confirm-btn-cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.notification-confirm-btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.notification-confirm-btn-confirm {
+    background: #ff6b35;
+    color: #ffffff;
+    border-color: #ff6b35;
+}
+
+.notification-confirm-btn-confirm:hover {
+    background: #ff7d4d;
+    border-color: #ff7d4d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+@media (max-width: 768px) {
+    .notifications-container {
+        top: 16px;
+        right: 16px;
+        left: 16px;
+        max-width: none;
+        width: auto;
+    }
+
+    .notification {
+        padding: 14px 16px;
+    }
+
+    .notification-message {
+        font-size: 13px;
+    }
+
+    .notification-confirm-content {
+        padding: 24px;
+        min-width: 280px;
+        margin: 0 20px;
+    }
+
+    .notification-confirm-message {
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    .notification-confirm-buttons {
+        flex-direction: column;
+    }
+
+    .notification-confirm-btn {
+        width: 100%;
+    }
+}
+

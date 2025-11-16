@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Все туры | MARK INVEST TOUR</title>
+<meta name="description" content="Все доступные туры MARK INVEST TOUR" />
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/images/black.png" media="(prefers-color-scheme: light)"/>
+<link rel="icon" type="image/svg+xml" sizes="any" href="/assets/images/favicon.svg">
+<link rel="stylesheet" href="/assets/css/tilda-grid-3.0.min.css" type="text/css" media="all" />
+<link rel="stylesheet" href="/assets/css/tilda-blocks-page69429579.min.css" type="text/css" media="all" />
+<link rel="stylesheet" href="/public/theme.css" type="text/css" media="all" />
+<script src="/assets/js/jquery-1.10.2.min.js"></script>
+<script src="/assets/js/tilda-scripts-3.0.min.js" charset="utf-8" defer></script>
+<script src="/assets/js/swiper-bundle.min.js"></script>
+<style>
+  :root {
+    --mark-bg: #1f1f1f;
+    --mark-text: #ffffff;
+    --mark-accent: #ff2f4b;
+    --tour-bg: #050505;
+    --tour-panel: rgba(6, 6, 6, 0.85);
+    --tour-card: rgba(15, 15, 15, 0.9);
+    --tour-border: rgba(255, 255, 255, 0.08);
+    --tour-border-strong: rgba(255, 255, 255, 0.2);
+    --tour-muted: rgba(245, 244, 240, 0.75);
+    --tour-gradient: linear-gradient(120deg, #f2003c 0%, #ff3b53 52%, #ff6b45 100%);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'TTHoves', Arial, sans-serif;
+    background-color: var(--mark-bg);
+    color: var(--mark-text);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+  }
+
+  /* Стили навигации (как на странице туров) */
+  .tour-hero-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 18px 20px;
+    background-color: rgba(31, 31, 31, 0.6);
+    background-image: none !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
+    pointer-events: none;
+  }
+  
+  .tour-hero-banner * {
+    pointer-events: auto;
+  }
+  
+  .tour-hero-banner.scrolled {
+    background-color: rgba(31, 31, 31, 0.95);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+  }
+  
+  .tour-hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  
+  .tour-hero-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .tour-back-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    background-color: rgba(31, 31, 31, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 24px;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .tour-back-button:hover {
+    background-color: rgba(31, 31, 31, 0.95);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .tour-hero-logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    height: 28px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .tour-hero-logo img {
+    height: 100%;
+    width: auto;
+    display: block;
+    max-width: 100%;
+  }
+  
+  .tour-hero-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .tour-hero-button {
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+    background-color: rgba(31, 31, 31, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 16px;
+  }
+
+  .tour-hero-button:hover {
+    background-color: rgba(31, 31, 31, 0.95);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .tour-hero-button svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .all-tours-wrapper {
+    padding-top: 80px; /* Отступ для фиксированной навигации */
+    min-height: 100vh;
+  }
+
+  .all-tours-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+
+  /* Заголовок страницы */
+  .all-tours-title {
+    color: #ffffff;
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 500;
+    letter-spacing: -0.05em;
+    text-transform: uppercase;
+    margin: 0 0 40px 0;
+    line-height: 1.2;
+    font-family: 'TTHoves', Arial, sans-serif;
+    position: relative;
+    padding-bottom: 20px;
+  }
+
+  .all-tours-title::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(120deg, #f2003c 0%, #ff3b53 52%, #ff6b45 100%);
+    margin-top: 16px;
+    border-radius: 2px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+  }
+
+  /* Grid для всех туров */
+  .all-tours-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 30px !important;
+    padding: 40px 20px !important;
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    position: relative !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    justify-items: center !important;
+  }
+
+  /* Стили карточек туров (как на главной странице) */
+  .all-tours-grid .travelCard {
+    position: relative;
+    width: 100%;
+    max-width: 353px;
+    height: auto;
+    min-height: 520px;
+    background-color: #393a3f;
+    border-radius: 24px;
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .all-tours-grid .travelCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .all-tours-grid .travelCard .tour-card-image {
+    width: 100%;
+    height: 277px;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    border-radius: 16px 16px 0 0;
+    margin: 8px 8px 0 8px;
+    transition: transform 0.3s ease;
+    opacity: 0;
+  }
+
+  .all-tours-grid .travelCard .tour-card-image.loaded {
+    opacity: 1;
+  }
+
+  .all-tours-grid .travelCard:hover .tour-card-image {
+    transform: scale(1.03);
+  }
+
+  .all-tours-grid .travelCard .tour-card-content {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .all-tours-grid .travelCard .tour-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .all-tours-grid .travelCard .tour-card-date {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .all-tours-grid .travelCard .tour-card-separator {
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  .all-tours-grid .travelCard .tour-card-price {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .all-tours-grid .travelCard .tour-card-title {
+    font-size: 24px;
+    font-weight: 500;
+    color: #ffffff;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    font-family: 'TTHoves', Arial, sans-serif;
+  }
+
+  .all-tours-grid .travelCard .tour-card-description {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .loading {
+    text-align: center;
+    padding: 60px 20px;
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .error {
+    text-align: center;
+    padding: 60px 20px;
+    font-size: 18px;
+    color: rgba(255, 47, 75, 0.8);
+  }
+
+  .no-tours {
+    text-align: center;
+    padding: 60px 20px;
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  @media screen and (max-width: 1024px) {
+    .all-tours-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 24px !important;
+      padding: 30px 20px !important;
+    }
+
+    .all-tours-grid .travelCard {
+      max-width: 100%;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .all-tours-wrapper {
+      padding-top: 70px; /* Отступ для мобильной навигации */
+    }
+
+    .all-tours-container {
+      padding: 30px 16px 60px;
+    }
+
+    .all-tours-title {
+      font-size: clamp(28px, 7vw, 36px);
+      margin-bottom: 30px;
+      padding-bottom: 16px;
+    }
+
+    .all-tours-title::after {
+      width: 60px;
+      height: 2px;
+      margin-top: 12px;
+    }
+
+    .all-tours-grid {
+      grid-template-columns: 1fr !important;
+      gap: 24px !important;
+      padding: 30px 16px !important;
+    }
+
+    .all-tours-grid .travelCard {
+      max-width: 100%;
+      min-height: 480px;
+    }
+
+    .all-tours-grid .travelCard .tour-card-image {
+      height: 240px;
+    }
+
+    .tour-hero-banner {
+      padding: 12px 16px;
+    }
+
+    .tour-hero-content {
+      gap: 12px;
+    }
+
+    .tour-hero-logo {
+      height: 22px;
+    }
+
+    .tour-back-button {
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+
+    .tour-hero-button {
+      width: 36px;
+      height: 36px;
+      padding: 7px;
+    }
+
+    .tour-hero-button svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  @media screen and (max-width: 540px) {
+    .tour-hero-banner {
+      padding: 10px 12px;
+    }
+
+    .tour-hero-content {
+      gap: 8px;
+    }
+
+    .tour-hero-logo {
+      height: 18px;
+    }
+
+    .tour-back-button {
+      padding: 6px 10px;
+      font-size: 11px;
+    }
+
+    .tour-hero-button {
+      width: 32px;
+      height: 32px;
+      padding: 6px;
+    }
+  }
+</style>
+</head>
+<body>
+  <!-- Верхняя навигация (как на странице туров) -->
+  <div class="tour-hero-banner">
+    <div class="tour-hero-content">
+      <div class="tour-hero-left">
+        <a href="/" class="tour-back-button" data-translate="common.back">← Назад</a>
+      </div>
+      <a href="/" class="tour-hero-logo">
+        <img src="/assets/images/ne_logo.svg" alt="MARK INVEST TOUR" />
+      </a>
+      <div class="tour-hero-right">
+        <button class="tour-hero-button" id="currency-toggle" title="Переключить валюту">$</button>
+        <button class="tour-hero-button" id="chat-button" title="Связаться с нами">
+          <svg width="20" height="20" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9.25 6.25H14.75C15.578 6.25 16.25 6.922 16.25 7.75V16.25L13.5 13.75H9.25C8.422 13.75 7.75 13.078 7.75 12.25V7.75C7.75 6.922 8.422 6.25 9.25 6.25Z" fill="currentColor" fill-opacity="0.3"/>
+            <path d="M9.25 6.25H14.75C15.578 6.25 16.25 6.922 16.25 7.75V16.25L13.5 13.75H9.25C8.422 13.75 7.75 13.078 7.75 12.25V7.75C7.75 6.922 8.422 6.25 9.25 6.25Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M11.937 3.75C11.715 2.888 10.932 2.25 10 2.25H3.75C2.645 2.25 1.75 3.145 1.75 4.25V13.75L4.5 11.25H5.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Контент с турами -->
+  <div class="all-tours-wrapper">
+    <div class="all-tours-container">
+      <h1 class="all-tours-title" data-translate="tours.allTours">Все туры</h1>
+      <div id="loading" class="loading">Загрузка туров...</div>
+      <div id="error" class="error" style="display: none;"></div>
+      <div id="tours-grid" class="all-tours-grid" style="display: none;"></div>
+    </div>
+  </div>
+
+  <!-- Скрипты -->
+  <script src="/public/i18n.js"></script>
+  <!-- Модульная структура Frontend -->
+  <script src="/public/js/config/api.config.js"></script>
+  <script src="/public/js/utils/logger.js"></script>
+  <script src="/public/js/utils/date.utils.js"></script>
+  <script src="/public/js/utils/currency.utils.js"></script>
+  <script src="/public/js/utils/image.utils.js"></script>
+  <script src="/public/js/utils/dom.utils.js"></script>
+  <script src="/public/js/services/api.service.js"></script>
+  <script src="/public/js/services/tour.service.js"></script>
+  <script src="/public/js/components/CardHover.js"></script>
+  <script src="/public/js/components/TourCard/TravelCard.js"></script>
+  <script src="/public/api-integration.js"></script>
+  <link rel="stylesheet" href="/public/i18n.css" type="text/css" media="all" />
+  <script>
+    // API_URL уже объявлен в api-integration.js, просто используем его
+    // const API_URL уже определен в api-integration.js
+
+    async function loadAllTours() {
+      console.log('loadAllTours: начало загрузки');
+      const loadingEl = document.getElementById('loading');
+      const errorEl = document.getElementById('error');
+      const gridEl = document.getElementById('tours-grid');
+
+      try {
+        const apiUrl = window.API_URL || '/api';
+        console.log('loadAllTours: запрос к API:', `${apiUrl}/tours?status=active`);
+        const response = await fetch(`${apiUrl}/tours?status=active`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const tours = await response.json();
+        console.log('loadAllTours: получено туров:', tours?.length || 0, tours);
+        
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (errorEl) errorEl.style.display = 'none';
+        
+        if (!tours || tours.length === 0) {
+          console.warn('loadAllTours: туры не найдены');
+          if (gridEl) {
+            gridEl.innerHTML = '<div class="no-tours">Туры не найдены</div>';
+            gridEl.style.display = 'block';
+          }
+          return;
+        }
+
+        // Сортируем туры по дате начала
+        const sortedTours = [...tours].sort((a, b) => {
+          const dateA = a.date_start ? new Date(a.date_start).getTime() : 0;
+          const dateB = b.date_start ? new Date(b.date_start).getTime() : 0;
+          return dateA - dateB;
+        });
+
+        // Отображаем все туры используя функцию createTravelCard
+        const createTravelCardFn = window.createTravelCard || (window.tourAPI && window.tourAPI.createTravelCard);
+        console.log('loadAllTours: createTravelCardFn доступна?', typeof createTravelCardFn === 'function', createTravelCardFn);
+        
+        if (gridEl && createTravelCardFn && typeof createTravelCardFn === 'function') {
+          console.log('loadAllTours: используем createTravelCard для создания карточек');
+          gridEl.innerHTML = '';
+          
+          sortedTours.forEach((tour, index) => {
+            try {
+              const card = createTravelCardFn(tour);
+              if (card) {
+                gridEl.appendChild(card);
+                console.log(`loadAllTours: карточка ${index + 1} добавлена для тура ${tour.id}`);
+                
+                // Добавляем обработчики hover для карточек (если функция доступна)
+                if (typeof setupCardHover === 'function') {
+                  setupCardHover(card);
+                }
+                
+                // Инициализируем lazy loading для изображений
+                const imageDiv = card.querySelector('.tour-card-image');
+                if (imageDiv && typeof window.initLazyImage === 'function') {
+                  setTimeout(() => {
+                    window.initLazyImage(imageDiv);
+                  }, 100 * index); // Небольшая задержка для каждой карточки
+                } else if (imageDiv) {
+                  // Fallback: загружаем изображение напрямую
+                  const bgUrl = imageDiv.getAttribute('data-bg');
+                  if (bgUrl) {
+                    const img = new Image();
+                    img.onload = () => {
+                      imageDiv.style.backgroundImage = `url('${bgUrl}')`;
+                      imageDiv.style.opacity = '1';
+                      imageDiv.classList.add('loaded');
+                    };
+                    img.onerror = () => {
+                      imageDiv.style.opacity = '1';
+                      imageDiv.classList.add('loaded');
+                    };
+                    img.src = bgUrl;
+                  }
+                }
+              } else {
+                console.warn(`loadAllTours: не удалось создать карточку для тура ${tour.id}`);
+              }
+            } catch (err) {
+              console.error(`loadAllTours: ошибка при создании карточки для тура ${tour.id}:`, err);
+            }
+          });
+
+          // Защищаем динамические карточки
+          if (typeof window.protectDynamicCards === 'function') {
+            window.protectDynamicCards();
+          }
+
+          gridEl.style.display = 'grid';
+          console.log('loadAllTours: сетка отображена, карточек:', gridEl.children.length);
+          
+          // Обновляем цены после создания карточек
+          setTimeout(() => {
+            if (typeof window.updateCurrencyPrices === 'function') {
+              window.updateCurrencyPrices();
+            } else {
+              window.dispatchEvent(new CustomEvent('toursLoaded'));
+            }
+          }, 1000);
+        } else {
+          // Fallback: простой рендеринг
+          console.log('loadAllTours: используем fallback рендеринг');
+          if (gridEl) {
+            gridEl.innerHTML = sortedTours.map(tour => {
+              const imageUrl = tour.image_url || '/assets/images/hero_background_new.jpg';
+              const price = tour.price ? parseInt(tour.price).toLocaleString('ru-RU') + ' ₽' : 'Цена по запросу';
+              const dateText = tour.date_start ? new Date(tour.date_start).toLocaleDateString('ru-RU') : '';
+
+              return `
+                <a href="/tour/${tour.id}" class="travelCard" data-dynamic-card="true" style="position: relative; width: 100%; max-width: 353px; height: auto; min-height: 520px; background-color: #393a3f; border-radius: 24px; overflow: hidden; cursor: pointer; display: flex; flex-direction: column; margin: 0 auto;">
+                  <div class="tour-card-image" style="width: 100%; height: 277px; background-image: url('${imageUrl}'); background-size: cover; background-position: center; border-radius: 16px 16px 0 0; margin: 8px 8px 0 8px;"></div>
+                  <div class="tour-card-content" style="padding: 16px; flex: 1; display: flex; flex-direction: column;">
+                    <div class="tour-card-meta" style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 14px; color: rgba(255, 255, 255, 0.5);">
+                      ${dateText ? `<span class="tour-card-date">${dateText}</span>` : ''}
+                      ${dateText && price ? '<span class="tour-card-separator"> • </span>' : ''}
+                      ${price ? `<span class="tour-card-price price">${price}</span>` : ''}
+                    </div>
+                    <div class="tour-card-title" style="font-size: 24px; font-weight: 500; color: #ffffff; line-height: 1.2; margin-bottom: 12px;">${tour.title || 'Тур'}</div>
+                    ${tour.short_description ? `<div class="tour-card-description" style="font-size: 14px; color: rgba(255, 255, 255, 0.5); line-height: 1.5;">${tour.short_description}</div>` : ''}
+                  </div>
+                </a>
+              `;
+            }).join('');
+
+            gridEl.style.display = 'grid';
+            console.log('loadAllTours: fallback рендеринг завершен, карточек:', gridEl.children.length);
+          }
+        }
+      } catch (error) {
+        console.error('loadAllTours: ошибка загрузки туров:', error);
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (errorEl) {
+          errorEl.textContent = 'Ошибка загрузки туров. Пожалуйста, попробуйте позже.';
+          errorEl.style.display = 'block';
+        }
+      }
+    }
+
+    // Загружаем туры при загрузке страницы
+    function initToursLoading() {
+      console.log('initToursLoading: инициализация загрузки туров');
+      console.log('initToursLoading: window.createTravelCard доступна?', typeof window.createTravelCard);
+      console.log('initToursLoading: window.tourAPI доступен?', typeof window.tourAPI);
+      
+      // Функция для проверки готовности и загрузки
+      function tryLoadTours() {
+        // Проверяем, загружен ли api-integration.js
+        if (typeof window.createTravelCard === 'function' || (window.tourAPI && typeof window.tourAPI.createTravelCard === 'function')) {
+          console.log('initToursLoading: api-integration.js загружен, запускаем loadAllTours');
+          loadAllTours();
+        } else {
+          console.log('initToursLoading: api-integration.js еще не загружен, ждем...');
+          // Пробуем еще раз через 100ms (максимум 10 попыток = 1 секунда)
+          let attempts = 0;
+          const maxAttempts = 10;
+          const checkInterval = setInterval(() => {
+            attempts++;
+            if (typeof window.createTravelCard === 'function' || (window.tourAPI && typeof window.tourAPI.createTravelCard === 'function')) {
+              console.log('initToursLoading: api-integration.js загружен после попытки', attempts);
+              clearInterval(checkInterval);
+              loadAllTours();
+            } else if (attempts >= maxAttempts) {
+              console.warn('initToursLoading: api-integration.js не загрузился, используем fallback');
+              clearInterval(checkInterval);
+              loadAllTours(); // Все равно загружаем, fallback сработает
+            }
+          }, 100);
+        }
+      }
+      
+      // Запускаем после загрузки DOM
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          setTimeout(tryLoadTours, 100);
+        });
+      } else {
+        // DOM уже загружен
+        setTimeout(tryLoadTours, 100);
+      }
+    }
+    
+    // Запускаем инициализацию
+    initToursLoading();
+
+    // Инициализация навигации и переключения валют
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Обработка скролла для изменения фона баннера
+      const heroBanner = document.querySelector('.tour-hero-banner');
+      if (heroBanner) {
+        window.addEventListener('scroll', () => {
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          if (scrollTop > 50) {
+            heroBanner.classList.add('scrolled');
+          } else {
+            heroBanner.classList.remove('scrolled');
+          }
+        });
+      }
+
+      // Кнопка переключения валюты
+      const currencyToggle = document.getElementById('currency-toggle');
+      if (currencyToggle) {
+        let currentCurrency = localStorage.getItem('selectedCurrency') || 'RUB';
+        
+        const updateCurrencyDisplay = () => {
+          currencyToggle.textContent = currentCurrency === 'USD' ? '$' : '₽';
+          if (typeof window.updateCurrencyPrices === 'function') {
+            window.updateCurrencyPrices();
+          }
+        };
+        
+        updateCurrencyDisplay();
+        
+        currencyToggle.addEventListener('click', () => {
+          currentCurrency = currentCurrency === 'USD' ? 'RUB' : 'USD';
+          localStorage.setItem('selectedCurrency', currentCurrency);
+          updateCurrencyDisplay();
+        });
+      }
+
+      // Кнопка чата
+      const chatButton = document.getElementById('chat-button');
+      if (chatButton) {
+        chatButton.addEventListener('click', () => {
+          window.open('https://api.whatsapp.com/send/?phone=79259009000', '_blank');
+        });
+      }
+    });
+  </script>
+</body>
+</html>
+

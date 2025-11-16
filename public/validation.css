@@ -1,0 +1,72 @@
+/* Стили для валидации форм */
+
+.field-error {
+    border-color: #f44336 !important;
+    background-color: rgba(244, 67, 54, 0.05) !important;
+    box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1) !important;
+}
+
+.field-error:focus {
+    border-color: #f44336 !important;
+    box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.2) !important;
+}
+
+.field-error-message {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #f44336;
+    font-weight: 400;
+    line-height: 1.4;
+    animation: fieldErrorAppear 0.3s ease;
+}
+
+@keyframes fieldErrorAppear {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Стили для валидации в формах тура */
+.tour-form-input.field-error,
+.tour-form-textarea.field-error {
+    border-color: #f44336;
+    background-color: rgba(244, 67, 54, 0.05);
+}
+
+.tour-form-input.field-error:focus,
+.tour-form-textarea.field-error:focus {
+    border-color: #f44336;
+    box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.2);
+}
+
+/* Стили для валидации в админ панели */
+.form-input.field-error,
+.form-textarea.field-error,
+.form-select.field-error {
+    border-color: #f44336;
+    background-color: rgba(244, 67, 54, 0.05);
+}
+
+.form-input.field-error:focus,
+.form-textarea.field-error:focus,
+.form-select.field-error:focus {
+    border-color: #f44336;
+    box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.2);
+}
+
+/* Успешная валидация */
+.field-success {
+    border-color: #4CAF50 !important;
+}
+
+.field-success:focus {
+    border-color: #4CAF50 !important;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1) !important;
+}
+

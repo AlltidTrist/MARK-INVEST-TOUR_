@@ -1,0 +1,90 @@
+/**
+ * Главный файл сервера
+ * Рефакторинг: разделение на модули
+ */
+
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const path = require('path');
+const helmet = require('helmet');
+require('dotenv').config();
+
+// Импорт конфигурации
+const { initDatabase } = require('./server/config/database');
+const { apiLimiter } = require('./server/middleware/rateLimit.middleware');
+const { errorHandler, notFoundHandler } = require('./server/middleware/error.middleware');
+const apiRoutes = require('./server/routes');
+
+// Инициализация Express
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: false, // Отключаем для Tilda CMS
+  crossOriginEmbedderPolicy: false
+}));
+
+// Основные middleware
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use('/api/', apiLimiter);
+
+// Статические файлы
+app.use('/assets', express.static(path.join(__dirname, 'assets'), {
+  maxAge: '1d',
+  etag: true
+}));
+app.use('/admin', express.static(path.join(__dirname, 'admin')));
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
+// API роуты
+app.use('/api', apiRoutes);
+
+// Роуты для страниц
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin', 'index.html'));
+});
+
+app.get('/admin/login.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin', 'login.html'));
+});
+
+app.get('/tour/:id', (req, res) => {
+  res.sendFile(path.join(__dirname, 'tour.html'));
+});
+
+app.get('/all-tours.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'all-tours.html'));
+});
+
+// Обработка всех остальных маршрутов - возвращаем index.html для SPA
+app.get('*', (req, res) => {
+  if (['/api', '/admin', '/assets', '/public'].some(prefix => req.path.startsWith(prefix))) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Middleware для обработки ошибок (должен быть последним)
+app.use(errorHandler);
+app.use(notFoundHandler);
+
+// Инициализация базы данных и запуск сервера
+initDatabase()
+  .then(() => {
+app.listen(PORT, () => {
+  console.log(`Сервер запущен на http://localhost:${PORT}`);
+  console.log(`Админ-панель: http://localhost:${PORT}/admin`);
+    });
+  })
+  .catch((err) => {
+    console.error('Ошибка инициализации базы данных:', err);
+    process.exit(1);
+});

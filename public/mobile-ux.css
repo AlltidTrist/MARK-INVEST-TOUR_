@@ -1,0 +1,264 @@
+/* Улучшение UX на мобильных устройствах */
+
+/* Улучшение touch-жестов для слайдеров */
+@media (max-width: 768px) {
+  /* Увеличиваем область касания для кнопок навигации */
+  .swiper-button-next,
+  .swiper-button-prev {
+    width: 44px !important;
+    height: 44px !important;
+    margin-top: -22px !important;
+  }
+  
+  .swiper-button-next:after,
+  .swiper-button-prev:after {
+    font-size: 20px !important;
+  }
+  
+  /* Улучшение touch-жестов для карточек */
+  .travelCard,
+  .preorderCard {
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
+    touch-action: manipulation;
+  }
+  
+  /* Оптимизация размеров кнопок для мобильных */
+  button,
+  .btn,
+  a[role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 20px;
+    font-size: 16px;
+  }
+  
+  /* Улучшение отображения карточек туров на маленьких экранах */
+  .travelCard {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important; /* Убираем margin, используем gap в родителе */
+  }
+  
+  /* Вертикальное расположение карточек на мобильных - принудительно */
+  #rec1170228026 .tn-group[data-group-id="175278397639235650"] {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important; /* Отключаем grid */
+  }
+  
+  /* КРИТИЧНО: Переопределяем display: contents на flex для мобильных */
+  #rec1170228026 .tn-group[data-group-id="175278397639235650"] .tn-molecule {
+    display: flex !important; /* Переопределяем display: contents */
+    flex-direction: column !important;
+    gap: 24px !important;
+    width: 100% !important;
+    flex-wrap: nowrap !important; /* Не переносим карточки */
+  }
+  
+  /* Все карточки на полную ширину, друг под другом */
+  #rec1170228026 .travelCard[data-dynamic-card="true"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+  }
+  
+  /* КРИТИЧНО: Убираем фиксированную высоту artboard */
+  #rec1170228026 .t396__artboard {
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+  }
+  
+  /* Убеждаемся, что контейнер не скрывает карточки */
+  #rec1170228026 .tn-group[data-group-id="175278397639235650"] {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+  }
+  
+  #rec1170228026 .tn-group[data-group-id="175278397639235650"] .tn-molecule {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+  }
+  
+  /* Плавная прокрутка к секциям */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Улучшение форм на мобильных */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="date"],
+  textarea,
+  select {
+    font-size: 16px !important; /* Предотвращает зум на iOS */
+    padding: 12px 16px;
+    min-height: 44px;
+  }
+  
+  /* Улучшение навигации */
+  .tour-hero-banner {
+    padding: 12px 16px !important;
+  }
+  
+  .tour-hero-button {
+    min-width: 44px !important;
+    min-height: 44px !important;
+  }
+  
+  /* Улучшение отображения текста */
+  .tour-title {
+    font-size: 36px !important;
+    line-height: 1.2 !important;
+  }
+  
+  .tour-price {
+    font-size: 32px !important;
+  }
+  
+  /* Улучшение галереи изображений */
+  .tour-gallery {
+    touch-action: pan-y;
+  }
+  
+  .tour-gallery-item {
+    min-height: 200px;
+  }
+
+  /* Форма "Поможем подобрать путешествие" - вертикальное расположение полей на мобильных */
+  #rec1058341366 .tn-group[data-group-id="174829168366758540"] .t-inputgroup,
+  #rec1058341366 .tn-group[data-group-id="174829168366758540"] .t-input-group {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    width: 100% !important;
+  }
+
+  #rec1058341366 .tn-group[data-group-id="174829168366758540"] .t-inputgroup > *,
+  #rec1058341366 .tn-group[data-group-id="174829168366758540"] .t-input-group > * {
+    width: 100% !important;
+    margin-right: 0 !important;
+    margin-bottom: 16px !important;
+  }
+
+  /* Поля ввода формы - полная ширина, друг под другом */
+  #rec1058341366 .tn-group[data-group-id="174829168366758540"] input[type="text"],
+  #rec1058341366 .tn-group[data-group-id="174829168366758540"] input[type="email"],
+  #rec1058341366 .tn-group[data-group-id="174829168366758540"] input[type="tel"],
+  #rec1058341366 .tn-group[data-group-id="174829168366758540"] textarea,
+  #rec1058341366 .tn-group[data-group-id="174829168366758540"] select {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-right: 0 !important;
+    margin-bottom: 16px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Кнопка отправки формы - полная ширина */
+  #rec1058341366 .tn-group[data-group-id="174829168366758540"] button[type="submit"],
+  #rec1058341366 .tn-group[data-group-id="174829168366758540"] .t-btnflex {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-top: 8px !important;
+  }
+
+  /* Контейнер формы - вертикальное расположение */
+  #rec1058341366 .tn-group[data-group-id="174829168366758540"] #molecule-174829168366758540 {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 24px !important;
+  }
+
+  /* Общие стили для всех форм Tilda на мобильных - вертикальное расположение */
+  .t-inputgroup,
+  .t-input-group,
+  [class*="t-inputgroup"],
+  [class*="t-input-group"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    width: 100% !important;
+  }
+
+  .t-inputgroup > *,
+  .t-input-group > *,
+  [class*="t-inputgroup"] > *,
+  [class*="t-input-group"] > * {
+    width: 100% !important;
+    margin-right: 0 !important;
+    margin-bottom: 16px !important;
+    flex: 1 1 100% !important;
+  }
+
+  /* Поля ввода в формах Tilda - полная ширина */
+  .t-input,
+  .t-inputgroup input,
+  .t-input-group input,
+  [class*="t-inputgroup"] input,
+  [class*="t-input-group"] input {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-right: 0 !important;
+    margin-bottom: 16px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Кнопки в формах Tilda - полная ширина на мобильных */
+  .t-inputgroup button,
+  .t-input-group button,
+  [class*="t-inputgroup"] button,
+  [class*="t-input-group"] button {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-top: 8px !important;
+  }
+}
+
+/* Улучшение для очень маленьких экранов */
+@media (max-width: 480px) {
+  .tour-title {
+    font-size: 28px !important;
+  }
+  
+  .tour-price {
+    font-size: 24px !important;
+  }
+  
+  .tour-meta-item {
+    font-size: 14px !important;
+    padding: 6px 12px !important;
+  }
+}
+
+/* Предотвращение двойного тапа для зума на iOS */
+@media (max-width: 768px) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  a, button {
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Улучшение скролла на мобильных */
+@media (max-width: 768px) {
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .tour-programs-slider {
+    -webkit-overflow-scrolling: touch;
+    overflow-x: auto;
+  }
+}
+

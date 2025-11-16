@@ -1,0 +1,92 @@
+{
+  "pageTitle": "MARK INVEST TOUR - Travel Around the World",
+  "pageDescription": "Organizing unforgettable journeys around the world. Individual tours and group trips.",
+  "common": {
+    "more": "More",
+    "book": "Book",
+    "from": "from",
+    "days": "days",
+    "back": "← Back",
+    "close": "Close",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "toggleCurrency": "Toggle currency",
+    "contactUs": "Contact us",
+    "loadingTourInfo": "Loading tour information...",
+    "nextSlide": "Next slide",
+    "prevSlide": "Previous slide"
+  },
+  "calendar": {
+    "title": "Tour Availability Calendar",
+    "description": "Select a date to see available tours",
+    "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    "weekdays": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    "day": "Day",
+    "tour": "Tour"
+  },
+  "subscription": {
+    "title": "Be the first to know about new tours",
+    "description": "Subscribe to our newsletter and receive information about new journeys and special offers",
+    "emailPlaceholder": "Your email",
+    "button": "Subscribe",
+    "privacy": "By clicking \"Subscribe\", you agree to",
+    "privacyLink": "Privacy Policy"
+  },
+  "tours": {
+    "allTours": "All Tours"
+  },
+  "tour": {
+    "book": "Book Tour",
+    "program": "Travel Program",
+    "gallery": "Gallery",
+    "description": "Description",
+    "details": "Tour Details",
+    "price": "Price",
+    "duration": "Duration",
+    "location": "Location",
+    "dateStart": "Start Date",
+    "dateEnd": "End Date",
+    "maxParticipants": "Max Participants",
+    "form": {
+      "name": "Your Name",
+      "phone": "Your Phone",
+      "email": "Your Email (optional)",
+      "message": "Additional Information (optional)",
+      "submit": "Submit Application"
+    }
+  },
+  "admin": {
+    "tours": "Tours",
+    "applications": "Applications",
+    "stats": "Statistics",
+    "settings": "Settings",
+    "logout": "Logout",
+    "addTour": "Add Tour",
+    "editTour": "Edit Tour",
+    "deleteTour": "Delete Tour",
+    "activeTours": "Active Tours",
+    "totalTours": "Total Tours",
+    "newApplications": "New Applications",
+    "totalApplications": "Total Applications",
+    "subscribers": "Subscribers",
+    "exportAll": "Export All",
+    "exportNew": "Export New"
+  },
+  "footer": {
+    "phone": "+7 925 900 9000",
+    "email": "info@markinvesttour.com"
+  },
+  "cookie": {
+    "message": "We use cookies to improve site performance, personalize content and analyze traffic. By continuing to use the site, you agree to",
+    "policy": "Privacy Policy",
+    "accept": "Accept and Continue",
+    "close": "Close notification"
+  }
+}
+
