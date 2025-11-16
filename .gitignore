@@ -15,10 +15,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Database
-*.db
-*.db-shm
-*.db-wal
-travel.db*
+
 
 # OS
 .DS_Store
