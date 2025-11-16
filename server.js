@@ -84,6 +84,16 @@ app.use('/api', apiRoutes);
 
 // Роуты для страниц
 app.get('/', (req, res) => {
+  // Проверяем, является ли устройство iOS
+  const userAgent = req.headers['user-agent'] || '';
+  const isIOS = /iPhone|iPad|iPod/i.test(userAgent);
+  
+  // Для iOS отдаём упрощённую версию
+  if (isIOS) {
+    return res.sendFile(path.join(__dirname, 'ios.html'));
+  }
+  
+  // Для остальных устройств - обычная версия
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
