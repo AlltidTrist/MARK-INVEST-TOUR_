@@ -812,20 +812,20 @@ async function exportApplications(status = 'all') {
 // Рендеринг списка заявок
 function renderApplicationsList(applications) {
     return applications.map(app => `
-        <div style="background: linear-gradient(135deg, rgba(47, 48, 53, 1) 0%, rgba(31, 31, 31, 1) 100%); padding: 24px; border-radius: 16px; margin-bottom: 16px; border: 1px solid rgba(255, 255, 255, 0.05);">
-            <div style="display: flex; justify-content: space-between; align-items: start;">
-                <div style="flex: 1;">
-                    <h3 style="font-size: 18px; font-weight: 500; margin-bottom: 12px;">${app.name || 'Без имени'}</h3>
+        <div class="application-card" onclick="openApplicationModal(${app.id})" data-application-id="${app.id}">
+            <div class="application-card-content">
+                <div class="application-card-info">
+                    <h3 style="font-size: 18px; font-weight: 500; margin-bottom: 12px; color: #ffffff;">${app.name || 'Без имени'}</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 12px;">
                         <p style="color: rgba(255,255,255,0.8); margin: 0;">📞 ${app.phone || 'Не указан'}</p>
                         <p style="color: rgba(255,255,255,0.8); margin: 0;">✉️ ${app.email || 'Не указан'}</p>
                         ${app.tour_title ? `<p style="color: rgba(255,255,255,0.8); margin: 0;">🎯 Тур: ${app.tour_title}</p>` : ''}
                         <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 14px;">📅 ${new Date(app.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                     </div>
-                    ${app.message ? `<p style="color: rgba(255,255,255,0.6); margin-top: 12px; padding: 12px; background-color: rgba(255, 255, 255, 0.03); border-radius: 8px;">${app.message}</p>` : ''}
+                    ${app.message ? `<p style="color: rgba(255,255,255,0.6); margin-top: 12px; padding: 12px; background-color: rgba(255, 255, 255, 0.03); border-radius: 8px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${app.message}</p>` : ''}
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 8px; margin-left: 20px;">
-                    <select onchange="updateApplicationStatus(${app.id}, this.value)" style="padding: 8px 12px; background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: white; font-size: 14px; min-width: 150px;">
+                <div class="application-card-actions" onclick="event.stopPropagation();">
+                    <select onchange="updateApplicationStatus(${app.id}, this.value)" class="application-status-select" style="padding: 8px 12px; background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: white; font-size: 14px; min-width: 150px;">
                         <option value="new" ${app.status === 'new' ? 'selected' : ''}>Новая</option>
                         <option value="processed" ${app.status === 'processed' ? 'selected' : ''}>Обработана</option>
                         <option value="rejected" ${app.status === 'rejected' ? 'selected' : ''}>Отклонена</option>
@@ -1229,12 +1229,190 @@ function resetPasswordForm() {
     }
 }
 
+// Открытие модального окна с детальной информацией о заявке
+async function openApplicationModal(applicationId) {
+    try {
+        const response = await fetch(`${API_URL}/applications/${applicationId}`, {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Ошибка загрузки заявки');
+        }
+        
+        const app = await response.json();
+        
+        // Форматируем телефон для ссылок
+        let phone = app.phone ? app.phone.replace(/\D/g, '') : '';
+        const phoneFormatted = app.phone || 'Не указан';
+        
+        // Для Telegram нужен формат без +, но если номер начинается с 7 (Россия), заменяем на 7
+        // Telegram использует формат: https://t.me/+7XXXXXXXXXX или https://t.me/username
+        // Для WhatsApp используем формат: https://wa.me/7XXXXXXXXXX
+        let whatsappUrl = '#';
+        let telegramUrl = '#';
+        let phoneUrl = '#';
+        
+        if (phone) {
+            // Если номер начинается с 8, заменяем на 7
+            if (phone.startsWith('8') && phone.length === 11) {
+                phone = '7' + phone.substring(1);
+            }
+            // Если номер не начинается с кода страны, добавляем 7 для России
+            if (phone.length === 10) {
+                phone = '7' + phone;
+            }
+            
+            whatsappUrl = `https://wa.me/${phone}`;
+            telegramUrl = `https://t.me/+${phone}`;
+            phoneUrl = `tel:+${phone}`;
+        }
+        
+        // Форматируем дату
+        const dateFormatted = new Date(app.created_at).toLocaleDateString('ru-RU', { 
+            day: 'numeric', 
+            month: 'long', 
+            year: 'numeric', 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        
+        // Определяем статус
+        const statusLabels = {
+            'new': 'Новая',
+            'processed': 'Обработана',
+            'rejected': 'Отклонена'
+        };
+        const statusLabel = statusLabels[app.status] || app.status;
+        
+        // Создаем HTML для модального окна
+        const modalBody = document.getElementById('application-modal-body');
+        modalBody.innerHTML = `
+            <div class="application-info-item">
+                <div class="application-info-label">Имя</div>
+                <div class="application-info-value">${app.name || 'Не указано'}</div>
+            </div>
+            
+            <div class="application-info-item">
+                <div class="application-info-label">Телефон</div>
+                <div class="application-info-value">
+                    ${phoneFormatted}
+                    ${phone ? `<a href="${phoneUrl}" style="margin-left: 12px; color: #ff6b35; text-decoration: none;">📞 Позвонить</a>` : ''}
+                </div>
+            </div>
+            
+            ${app.email ? `
+            <div class="application-info-item">
+                <div class="application-info-label">Email</div>
+                <div class="application-info-value">
+                    <a href="mailto:${app.email}" style="color: #ff6b35; text-decoration: none;">${app.email}</a>
+                </div>
+            </div>
+            ` : ''}
+            
+            ${app.tour_title ? `
+            <div class="application-info-item">
+                <div class="application-info-label">Тур</div>
+                <div class="application-info-value">${app.tour_title}</div>
+            </div>
+            ` : ''}
+            
+            ${app.direction ? `
+            <div class="application-info-item">
+                <div class="application-info-label">Направление</div>
+                <div class="application-info-value">${app.direction}</div>
+            </div>
+            ` : ''}
+            
+            <div class="application-info-item">
+                <div class="application-info-label">Статус</div>
+                <div class="application-info-value">
+                    <select onchange="updateApplicationStatus(${app.id}, this.value); closeApplicationModal(); setTimeout(() => loadApplications(), 500);" class="application-status-select" style="padding: 8px 12px; background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: white; font-size: 14px; min-width: 150px;">
+                        <option value="new" ${app.status === 'new' ? 'selected' : ''}>Новая</option>
+                        <option value="processed" ${app.status === 'processed' ? 'selected' : ''}>Обработана</option>
+                        <option value="rejected" ${app.status === 'rejected' ? 'selected' : ''}>Отклонена</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="application-info-item">
+                <div class="application-info-label">Дата создания</div>
+                <div class="application-info-value">${dateFormatted}</div>
+            </div>
+            
+            ${app.message ? `
+            <div class="application-info-item">
+                <div class="application-info-label">Сообщение</div>
+                <div class="application-message">${app.message}</div>
+            </div>
+            ` : ''}
+            
+            ${phone ? `
+            <div class="application-actions">
+                <a href="${whatsappUrl}" target="_blank" class="btn-messenger btn-whatsapp" onclick="event.stopPropagation();">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    </svg>
+                    WhatsApp
+                </a>
+                <a href="${telegramUrl}" target="_blank" class="btn-messenger btn-telegram" onclick="event.stopPropagation();">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                    </svg>
+                    Telegram
+                </a>
+                <a href="${phoneUrl}" class="btn-messenger btn-phone" onclick="event.stopPropagation();">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                    </svg>
+                    Позвонить
+                </a>
+            </div>
+            ` : ''}
+        `;
+        
+        // Показываем модальное окно
+        const modal = document.getElementById('application-modal');
+        modal.classList.add('active');
+        
+        // Закрытие по клику вне модального окна
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeApplicationModal();
+            }
+        });
+        
+        // Закрытие по Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeApplicationModal();
+            }
+        });
+        
+    } catch (error) {
+        console.error('Ошибка загрузки заявки:', error);
+        if (typeof showError !== 'undefined') {
+            showError('Ошибка загрузки заявки');
+        }
+    }
+}
+
+// Закрытие модального окна
+function closeApplicationModal() {
+    const modal = document.getElementById('application-modal');
+    modal.classList.remove('active');
+}
+
 // Делаем функции глобальными для использования в onclick
 if (typeof window !== 'undefined') {
     window.removeGalleryNewImage = removeGalleryNewImage;
     window.removeGalleryImage = removeGalleryImage;
     window.exportApplications = exportApplications;
     window.updateApplicationStatus = updateApplicationStatus;
+    window.openApplicationModal = openApplicationModal;
+    window.closeApplicationModal = closeApplicationModal;
 }
 
 // Выход из системы

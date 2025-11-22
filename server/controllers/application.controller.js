@@ -17,6 +17,19 @@ async function getAll(req, res, next) {
 }
 
 /**
+ * Получить заявку по ID
+ */
+async function getById(req, res, next) {
+  try {
+    const { id } = req.params;
+    const application = await Application.findById(parseInt(id));
+    res.json(application);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
  * Создать заявку
  */
 async function create(req, res, next) {
@@ -81,6 +94,7 @@ async function exportToCSV(req, res, next) {
 
 module.exports = {
   getAll,
+  getById,
   create,
   updateStatus,
   exportToCSV

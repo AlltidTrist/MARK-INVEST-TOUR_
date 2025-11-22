@@ -120,6 +120,34 @@
             box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
         }
 
+        /* Стили для option в выпадающих списках - черный текст на белом фоне */
+        select option {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            padding: 8px 12px;
+        }
+
+        select option:hover,
+        select option:focus {
+            background-color: #f0f0f0 !important;
+            color: #000000 !important;
+        }
+
+        select option:checked {
+            background-color: #007bff !important;
+            color: #ffffff !important;
+        }
+
+        /* Специальные стили для выпадающего списка статуса заявки */
+        .application-status-select option {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+        }
+
+        .application-status-select option:hover {
+            background-color: #f0f0f0 !important;
+        }
+
         .form-textarea {
             resize: vertical;
             min-height: 120px;
@@ -549,6 +577,271 @@
                 width: 100%;
                 height: 200px;
             }
+
+            /* Адаптивные стили для заявок */
+            .application-card {
+                flex-direction: column !important;
+            }
+
+            .application-card-actions {
+                margin-left: 0 !important;
+                margin-top: 16px !important;
+                width: 100% !important;
+            }
+
+            .application-status-select {
+                width: 100% !important;
+                min-width: auto !important;
+            }
+        }
+
+        /* Стили для модального окна заявки */
+        .application-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .application-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .application-modal-content {
+            background: linear-gradient(135deg, rgba(47, 48, 53, 1) 0%, rgba(31, 31, 31, 1) 100%);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 32px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            margin: auto;
+        }
+
+        .application-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .application-modal-title {
+            font-size: 24px;
+            font-weight: 500;
+            color: #ffffff;
+        }
+
+        .application-modal-close {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .application-modal-close:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .application-modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .application-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .application-info-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .application-info-value {
+            font-size: 16px;
+            color: #ffffff;
+            word-break: break-word;
+        }
+
+        .application-message {
+            padding: 16px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+
+        .application-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .btn-messenger {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            font-family: 'TTHoves', Arial, sans-serif;
+        }
+
+        .btn-whatsapp {
+            background-color: #25D366;
+            color: #ffffff;
+        }
+
+        .btn-whatsapp:hover {
+            background-color: #20BA5A;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-telegram {
+            background-color: #0088cc;
+            color: #ffffff;
+        }
+
+        .btn-telegram:hover {
+            background-color: #0077B5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 136, 204, 0.3);
+        }
+
+        .btn-phone {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-phone:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Стили для карточек заявок */
+        .application-card {
+            background: linear-gradient(135deg, rgba(47, 48, 53, 1) 0%, rgba(31, 31, 31, 1) 100%);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .application-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .application-card-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 20px;
+        }
+
+        .application-card-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .application-card-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-left: 20px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .application-modal {
+                padding: 10px;
+            }
+
+            .application-modal-content {
+                padding: 20px;
+                margin: 0;
+                max-height: 95vh;
+                border-radius: 16px;
+            }
+
+            .application-modal-title {
+                font-size: 20px;
+            }
+
+            .application-actions {
+                flex-direction: column;
+            }
+
+            .btn-messenger {
+                width: 100%;
+            }
+
+            .application-card-content {
+                flex-direction: column !important;
+                gap: 16px !important;
+            }
+
+            .application-card-actions {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+
+            .application-status-select {
+                width: 100% !important;
+                min-width: auto !important;
+            }
+
+            .application-info-item {
+                gap: 6px;
+            }
+
+            .application-info-value {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -700,6 +993,19 @@
                 </div>
             </div>
             <div id="applications-list"></div>
+        </div>
+
+        <!-- Модальное окно для детальной информации о заявке -->
+        <div id="application-modal" class="application-modal">
+            <div class="application-modal-content">
+                <div class="application-modal-header">
+                    <h2 class="application-modal-title">Детали заявки</h2>
+                    <button class="application-modal-close" onclick="closeApplicationModal()">&times;</button>
+                </div>
+                <div class="application-modal-body" id="application-modal-body">
+                    <!-- Контент будет добавлен через JavaScript -->
+                </div>
+            </div>
         </div>
 
         <div id="stats-section" class="admin-section" style="display: none;">

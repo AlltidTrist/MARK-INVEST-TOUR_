@@ -61,6 +61,32 @@ class Application {
   }
 
   /**
+   * Найти заявку по ID
+   * @param {number} id
+   * @returns {Promise<Object>}
+   */
+  static async findById(id) {
+    const db = getDatabase();
+
+    return new Promise((resolve, reject) => {
+      db.get(
+        `SELECT a.*, t.title as tour_title FROM applications a 
+         LEFT JOIN tours t ON a.tour_id = t.id WHERE a.id = ?`,
+        [id],
+        (err, application) => {
+          if (err) {
+            reject(err);
+          } else if (!application) {
+            reject(new NotFoundError('Заявка не найдена'));
+          } else {
+            resolve(application);
+          }
+        }
+      );
+    });
+  }
+
+  /**
    * Обновить статус заявки
    * @param {number} id
    * @param {string} status

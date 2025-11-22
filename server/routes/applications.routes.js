@@ -69,6 +69,35 @@ router.post('/', validateApplicationData, applicationController.create);
 
 /**
  * @swagger
+ * /applications/{id}:
+ *   get:
+ *     summary: Получить заявку по ID
+ *     tags: [Applications]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID заявки
+ *     responses:
+ *       200:
+ *         description: Данные заявки
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Application'
+ *       401:
+ *         description: Не авторизован
+ *       404:
+ *         description: Заявка не найдена
+ */
+router.get('/:id', authenticateToken, applicationController.getById);
+
+/**
+ * @swagger
  * /applications/{id}/status:
  *   put:
  *     summary: Обновить статус заявки
