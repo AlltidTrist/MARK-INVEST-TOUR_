@@ -84,14 +84,20 @@ async function create(req, res, next) {
   try {
     let imageUrl = null;
     
-    if (req.file) {
-      // Оптимизируем изображение тура
-      const imageService = require('../services/image.service');
-      const result = await imageService.optimizeTourImage(req.file.path);
-      imageUrl = `/assets/images/${path.basename(result.optimizedPath)}`;
+    // Обрабатываем основное изображение тура
+    if (req.files && Array.isArray(req.files)) {
+      const mainImage = req.files.find(f => f.fieldname === 'image');
+      if (mainImage) {
+        const imageService = require('../services/image.service');
+        const result = await imageService.optimizeTourImage(mainImage.path);
+        imageUrl = `/assets/images/${path.basename(result.optimizedPath)}`;
+      }
     }
     
-    const tourId = await tourService.create(req.body, imageUrl);
+    // Обрабатываем изображения программы, если они есть
+    const programImages = await processProgramImages(req.files);
+    
+    const tourId = await tourService.create(req.body, imageUrl, programImages);
     
     // Инвалидируем кэш списков туров
     await cacheService.invalidateAllTours();
@@ -119,14 +125,20 @@ async function update(req, res, next) {
     const tourId = parseInt(id);
     let imageUrl = null;
     
-    if (req.file) {
-      // Оптимизируем изображение тура
-      const imageService = require('../services/image.service');
-      const result = await imageService.optimizeTourImage(req.file.path);
-      imageUrl = `/assets/images/${path.basename(result.optimizedPath)}`;
+    // Обрабатываем основное изображение тура
+    if (req.files && Array.isArray(req.files)) {
+      const mainImage = req.files.find(f => f.fieldname === 'image');
+      if (mainImage) {
+        const imageService = require('../services/image.service');
+        const result = await imageService.optimizeTourImage(mainImage.path);
+        imageUrl = `/assets/images/${path.basename(result.optimizedPath)}`;
+      }
     }
     
-    await tourService.update(tourId, req.body, imageUrl);
+    // Обрабатываем изображения программы, если они есть
+    const programImages = await processProgramImages(req.files);
+    
+    await tourService.update(tourId, req.body, imageUrl, programImages);
     
     // Инвалидируем кэш этого тура и всех списков
     await cacheService.invalidateTour(tourId);
@@ -135,6 +147,36 @@ async function update(req, res, next) {
   } catch (error) {
     next(error);
   }
+}
+
+/**
+ * Обработать загруженные изображения программы
+ * @param {Array} files - Массив файлов от multer
+ * @returns {Promise<Object>} Объект с маппингом dayIndex -> imageUrl
+ */
+async function processProgramImages(files) {
+  if (!files || !Array.isArray(files)) {
+    return {};
+  }
+  
+  const imageService = require('../services/image.service');
+  const programImages = {};
+  
+  for (const file of files) {
+    // Имя поля должно быть в формате programImage_<dayIndex>
+    const match = file.fieldname && file.fieldname.match(/programImage_(\d+)/);
+    if (match) {
+      const dayIndex = match[1];
+      try {
+        const result = await imageService.optimizeTourImage(file.path);
+        programImages[dayIndex] = `/assets/images/${path.basename(result.optimizedPath)}`;
+      } catch (error) {
+        console.error(`Ошибка обработки изображения для дня ${dayIndex}:`, error);
+      }
+    }
+  }
+  
+  return programImages;
 }
 
 /**
@@ -162,8 +204,9 @@ async function remove(req, res, next) {
   }
 }
 
-// Middleware для загрузки файла
-const uploadMiddleware = upload.single('image');
+// Middleware для загрузки файла (основное изображение + изображения программы)
+// Используем any() для поддержки динамических имен полей
+const uploadMiddleware = upload.any();
 
 module.exports = {
   getAll,

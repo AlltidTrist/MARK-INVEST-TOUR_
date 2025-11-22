@@ -195,6 +195,13 @@ function addProgramDay() {
                 <textarea id="program_programm_${dayIndex}" class="form-textarea" placeholder="Опишите программу этого дня" style="min-height: 100px;" required></textarea>
             </div>
         </div>
+        <div class="form-group">
+            <label class="form-label" for="program_image_${dayIndex}">Изображение для дня</label>
+            <input type="file" id="program_image_${dayIndex}" name="programImage_${dayIndex}" accept="image/*" class="form-input" onchange="handleProgramImageSelect(${dayIndex}, this)">
+            <div id="program_image_preview_${dayIndex}" class="image-preview" style="margin-top: 10px; display: none;">
+                <img id="program_image_preview_img_${dayIndex}" src="" alt="Preview" style="max-width: 200px; max-height: 150px; border-radius: 8px;">
+            </div>
+        </div>
     `;
     
     container.appendChild(dayItem);
@@ -220,6 +227,37 @@ function handleImageSelect(e) {
             preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
         };
         reader.readAsDataURL(file);
+    }
+}
+
+// Обработка выбора изображения для дня программы
+function handleProgramImageSelect(dayIndex, input) {
+    const file = input.files[0];
+    const previewContainer = document.getElementById(`program_image_preview_${dayIndex}`);
+    const previewImg = document.getElementById(`program_image_preview_img_${dayIndex}`);
+    
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            if (previewImg) {
+                previewImg.src = e.target.result;
+            }
+            if (previewContainer) {
+                previewContainer.style.display = 'block';
+            }
+        };
+        reader.readAsDataURL(file);
+    } else {
+        // Если файл не выбран, показываем существующее изображение (если есть)
+        const existingImage = input.dataset.existingImage;
+        if (existingImage && previewImg) {
+            previewImg.src = existingImage;
+            if (previewContainer) {
+                previewContainer.style.display = existingImage ? 'block' : 'none';
+            }
+        } else if (previewContainer) {
+            previewContainer.style.display = 'none';
+        }
     }
 }
 
@@ -327,12 +365,27 @@ async function handleTourSubmit(e) {
         const dayIndex = item.dataset.dayIndex;
         const dayInput = document.getElementById(`program_day_${dayIndex}`);
         const programmInput = document.getElementById(`program_programm_${dayIndex}`);
+        const imageInput = document.getElementById(`program_image_${dayIndex}`);
         
         if (dayInput && programmInput && dayInput.value && programmInput.value.trim()) {
-            programs.push({
+            const programData = {
                 day: parseInt(dayInput.value),
-                programm: programmInput.value.trim()
-            });
+                programm: programmInput.value.trim(),
+                dayIndex: dayIndex
+            };
+            
+            // Если есть существующее изображение (из загруженного тура), сохраняем его URL
+            const existingImageUrl = imageInput?.dataset.existingImage;
+            if (existingImageUrl) {
+                programData.image_url = existingImageUrl;
+            }
+            
+            programs.push(programData);
+            
+            // Добавляем файл изображения в FormData, если он выбран
+            if (imageInput && imageInput.files && imageInput.files[0]) {
+                formData.append(`programImage_${dayIndex}`, imageInput.files[0]);
+            }
         }
     });
     
@@ -566,6 +619,8 @@ async function editTour(id) {
                 dayItem.className = 'program-day-item';
                 dayItem.dataset.dayIndex = dayIndex;
                 
+                const imageUrl = program.image_url || '';
+                const hasImage = imageUrl ? 'block' : 'none';
                 dayItem.innerHTML = `
                     <div class="program-day-item-header">
                         <div class="program-day-item-title">День ${dayIndex + 1}</div>
@@ -579,6 +634,13 @@ async function editTour(id) {
                         <div class="form-group">
                             <label class="form-label" for="program_programm_${dayIndex}">Программа дня</label>
                             <textarea id="program_programm_${dayIndex}" class="form-textarea" placeholder="Опишите программу этого дня" style="min-height: 100px;" required>${program.programm || ''}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="program_image_${dayIndex}">Изображение для дня</label>
+                        <input type="file" id="program_image_${dayIndex}" name="programImage_${dayIndex}" accept="image/*" class="form-input" data-existing-image="${imageUrl}" onchange="handleProgramImageSelect(${dayIndex}, this)">
+                        <div id="program_image_preview_${dayIndex}" class="image-preview" style="margin-top: 10px; display: ${hasImage};">
+                            <img id="program_image_preview_img_${dayIndex}" src="${imageUrl}" alt="Preview" style="max-width: 200px; max-height: 150px; border-radius: 8px;">
                         </div>
                     </div>
                 `;

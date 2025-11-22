@@ -113,6 +113,7 @@ function createTables() {
         tour_id INTEGER NOT NULL,
         day INTEGER NOT NULL,
         programm TEXT NOT NULL,
+        image_url TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (tour_id) REFERENCES tours(id) ON DELETE CASCADE
       )`,
@@ -201,9 +202,29 @@ function addColumnsIfNotExists() {
         }
         completed++;
         if (completed === columns.length) {
-          resolve();
+          // Добавляем поле image_url в tour_programs, если его нет
+          addProgramImageColumn()
+            .then(() => resolve())
+            .catch(() => resolve()); // Продолжаем даже при ошибке
         }
       });
+    });
+  });
+}
+
+/**
+ * Добавление поля image_url в таблицу tour_programs
+ * @returns {Promise<void>}
+ */
+function addProgramImageColumn() {
+  return new Promise((resolve) => {
+    db.run('ALTER TABLE tour_programs ADD COLUMN image_url TEXT', (err) => {
+      if (err && !err.message.includes('duplicate column') && !err.message.includes('already exists')) {
+        logger.error('Ошибка добавления поля image_url в tour_programs:', err.message);
+      } else {
+        logger.log('Поле image_url добавлено в tour_programs (или уже существует)');
+      }
+      resolve();
     });
   });
 }

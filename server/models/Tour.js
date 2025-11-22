@@ -268,13 +268,13 @@ class Tour {
         
         // Добавляем новую программу
         if (programs && programs.length > 0) {
-          const stmt = db.prepare('INSERT INTO tour_programs (tour_id, day, programm) VALUES (?, ?, ?)');
+          const stmt = db.prepare('INSERT INTO tour_programs (tour_id, day, programm, image_url) VALUES (?, ?, ?, ?)');
           let completed = 0;
           let hasError = false;
           
           programs.forEach(program => {
             if (program.day && program.programm) {
-              stmt.run([tourId, program.day, program.programm], (err) => {
+              stmt.run([tourId, program.day, program.programm, program.image_url || null], (err) => {
                 if (err && !hasError) {
                   hasError = true;
                   reject(err);

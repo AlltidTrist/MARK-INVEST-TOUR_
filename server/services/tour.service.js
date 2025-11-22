@@ -31,9 +31,10 @@ class TourService {
    * Создать новый тур
    * @param {Object} tourData
    * @param {string} imageUrl - URL загруженного изображения
+   * @param {Object} programImages - Объект с изображениями программы (dayIndex -> imageUrl)
    * @returns {Promise<number>} ID созданного тура
    */
-  async create(tourData, imageUrl = null) {
+  async create(tourData, imageUrl = null, programImages = {}) {
     const tourWithImage = {
       ...tourData,
       image_url: imageUrl
@@ -52,7 +53,15 @@ class TourService {
         programsArray = [];
       }
 
+      // Добавляем изображения к программам
       if (programsArray && programsArray.length > 0) {
+        programsArray = programsArray.map((program, index) => {
+          const dayIndex = program.dayIndex || index.toString();
+          return {
+            ...program,
+            image_url: programImages[dayIndex] || program.image_url || null
+          };
+        });
         await Tour.savePrograms(tourId, programsArray);
       }
     }
@@ -70,9 +79,10 @@ class TourService {
    * @param {number} id
    * @param {Object} tourData
    * @param {string} imageUrl - URL нового изображения (если загружено)
+   * @param {Object} programImages - Объект с изображениями программы (dayIndex -> imageUrl)
    * @returns {Promise<void>}
    */
-  async update(id, tourData, imageUrl = null) {
+  async update(id, tourData, imageUrl = null, programImages = {}) {
     const updateData = {
       ...tourData,
       ...(imageUrl && { image_url: imageUrl })
@@ -91,7 +101,18 @@ class TourService {
         programsArray = [];
       }
 
-      await Tour.savePrograms(id, programsArray);
+      // Добавляем изображения к программам
+      if (programsArray && programsArray.length > 0) {
+        programsArray = programsArray.map((program, index) => {
+          const dayIndex = program.dayIndex || index.toString();
+          // Сохраняем существующее изображение, если новое не загружено
+          return {
+            ...program,
+            image_url: programImages[dayIndex] || program.image_url || null
+          };
+        });
+        await Tour.savePrograms(id, programsArray);
+      }
     }
   }
 

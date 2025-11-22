@@ -472,8 +472,8 @@ function displayTourPrograms(tour) {
     // Сортируем программы по номеру дня
     const sortedPrograms = [...tour.programs].sort((a, b) => (a.day || 0) - (b.day || 0));
     
-    // Используем изображение тура как фон для всех дней (или можно использовать разные изображения)
-    const imageUrl = tour.image_url 
+    // Используем изображение тура как фон по умолчанию
+    const defaultImageUrl = tour.image_url 
         ? (tour.image_url.startsWith('/') ? tour.image_url : `/${tour.image_url}`)
         : '/assets/images/hero_background_new.jpg';
     
@@ -507,6 +507,11 @@ function displayTourPrograms(tour) {
         const programText = program.programm || '';
         const paragraphs = programText.split(/\n\n|\n/).filter(p => p.trim());
         
+        // Определяем изображение для дня (приоритет: изображение дня > изображение тура > дефолтное)
+        const dayImageUrl = program.image_url 
+            ? (program.image_url.startsWith('/') ? program.image_url : `/${program.image_url}`)
+            : defaultImageUrl;
+        
         // Создаем слайд
         const slide = document.createElement('div');
         slide.className = 'swiper-slide';
@@ -515,7 +520,7 @@ function displayTourPrograms(tour) {
         // Создаем карточку дня
         slide.innerHTML = `
             <div class="tour-program-day">
-                <div class="tour-program-day-image" style="background-image: url('${imageUrl}');">
+                <div class="tour-program-day-image" style="background-image: url('${dayImageUrl}');">
                     <div class="tour-program-day-badges">
                         <div class="tour-program-day-badge">День ${program.day || index + 1}</div>
                         ${dayDate ? `<div class="tour-program-day-badge">${dayDate}</div>` : ''}
