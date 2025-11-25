@@ -211,8 +211,14 @@
 
         .price-item-row {
             display: grid;
-            grid-template-columns: 1fr 2fr;
+            grid-template-columns: 1fr 1fr 2fr;
             gap: 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .price-item-row {
+                grid-template-columns: 1fr;
+            }
         }
 
         .file-upload {

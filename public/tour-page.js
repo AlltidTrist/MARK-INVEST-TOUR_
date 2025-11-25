@@ -287,14 +287,12 @@ function displayTourData(tour) {
     if (priceContainer) {
         // Если есть несколько цен, показываем их
         if (tour.prices && tour.prices.length > 0) {
-            const pricesHTML = tour.prices.map(priceItem => {
-                const price = priceItem.price || 0;
-                const description = priceItem.description ? ` - ${priceItem.description}` : '';
-                const formattedPrice = price.toLocaleString('ru-RU') + ' ₽';
-                return `<div class="tour-price-item">${formattedPrice}${description}</div>`;
-            }).join('');
+            // Сохраняем данные о ценах для последующего обновления
+            priceContainer.dataset.prices = JSON.stringify(tour.prices);
             
-            priceContainer.innerHTML = pricesHTML;
+            // Инициализируем отображение цен (будет обновлено после загрузки курсов)
+            updateTourPricesDisplay(priceContainer, tour.prices);
+            
             priceContainer.style.display = 'block';
             priceContainer.className = 'tour-price tour-price-multiple';
             console.log('Цены установлены, количество:', tour.prices.length);
@@ -816,26 +814,32 @@ async function updateTourPrice(priceContainer, priceRub, currency) {
     let displayPrice = priceRub;
     let symbol = '₽';
     
-    if (currency === 'USD') {
+    if (currency === 'USD' || currency === 'EUR') {
         // Получаем курс валют
         let usdRate = null;
+        let eurRate = null;
         try {
-            const res = await fetch("https://neverend.travel/api/currencies", { 
+            const res = await fetch("/api/currencies", { 
                 cache: "no-store" 
             });
             if (res.ok) {
                 const data = await res.json();
                 usdRate = data.data?.usd || null;
+                eurRate = data.data?.eur || null;
             }
         } catch (err) {
             console.warn("Курсы не получены:", err.message);
-            // Используем примерный курс если API недоступен
-            usdRate = 101.23; // Примерный курс из сайта
+            // Используем примерные курсы если API недоступен
+            usdRate = 95.0;
+            eurRate = 105.0;
         }
         
-        if (usdRate) {
+        if (currency === 'USD' && usdRate) {
             displayPrice = Math.round(priceRub / usdRate);
             symbol = '$';
+        } else if (currency === 'EUR' && eurRate) {
+            displayPrice = Math.round(priceRub / eurRate);
+            symbol = '€';
         }
     }
     
@@ -845,6 +849,74 @@ async function updateTourPrice(priceContainer, priceRub, currency) {
     });
     
     priceContainer.innerHTML = `от<br>${formattedPrice}${symbol}`;
+}
+
+// Функция обновления отображения нескольких цен тура
+async function updateTourPricesDisplay(priceContainer, prices) {
+    if (!priceContainer || !prices || prices.length === 0) return;
+    
+    const currentCurrency = localStorage.getItem('selectedCurrency') || 'RUB';
+    
+    // Получаем курсы валют
+    let usdRate = null;
+    let eurRate = null;
+    try {
+        const res = await fetch("/api/currencies", { 
+            cache: "no-store" 
+        });
+        if (res.ok) {
+            const data = await res.json();
+            usdRate = data.data?.usd || null;
+            eurRate = data.data?.eur || null;
+        }
+    } catch (err) {
+        console.warn("Курсы не получены:", err.message);
+        usdRate = 95.0;
+        eurRate = 105.0;
+    }
+    
+    const pricesHTML = prices.map(priceItem => {
+        const price = priceItem.price || 0;
+        const currency = priceItem.currency || 'RUB';
+        const description = priceItem.description ? ` - ${priceItem.description}` : '';
+        
+        let displayPrice = price;
+        let symbol = '₽';
+        
+        // Конвертируем цену в выбранную валюту
+        if (currentCurrency === 'USD' && currency === 'RUB' && usdRate) {
+            displayPrice = Math.round(price / usdRate);
+            symbol = '$';
+        } else if (currentCurrency === 'EUR' && currency === 'RUB' && eurRate) {
+            displayPrice = Math.round(price / eurRate);
+            symbol = '€';
+        } else if (currentCurrency === 'USD' && currency === 'EUR' && eurRate && usdRate) {
+            // Конвертируем EUR -> RUB -> USD
+            const rub = price * eurRate;
+            displayPrice = Math.round(rub / usdRate);
+            symbol = '$';
+        } else if (currentCurrency === 'EUR' && currency === 'USD' && usdRate && eurRate) {
+            // Конвертируем USD -> RUB -> EUR
+            const rub = price * usdRate;
+            displayPrice = Math.round(rub / eurRate);
+            symbol = '€';
+        } else if (currentCurrency === 'RUB' && currency === 'USD' && usdRate) {
+            displayPrice = Math.round(price * usdRate);
+            symbol = '₽';
+        } else if (currentCurrency === 'RUB' && currency === 'EUR' && eurRate) {
+            displayPrice = Math.round(price * eurRate);
+            symbol = '₽';
+        } else if (currency === 'USD') {
+            symbol = '$';
+        } else if (currency === 'EUR') {
+            symbol = '€';
+        }
+        
+        const formattedPrice = displayPrice.toLocaleString('ru-RU');
+        return `<div class="tour-price-item" data-price-currency="${currency}" data-price-value="${price}">${formattedPrice}${symbol}${description}</div>`;
+    }).join('');
+    
+    priceContainer.innerHTML = pricesHTML;
 }
 
 // Инициализация при загрузке страницы

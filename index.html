@@ -565,18 +565,30 @@ alt='' imgfield='tn_img_1751465164379'
   const usdPriceEls = document.querySelectorAll(".price .tn-atom");
   const eurPriceEls = document.querySelectorAll(".priceEuro .tn-atom");
   
-  // Получаем сохранённую валюту или используем USD по умолчанию
-  let currentCurrency = localStorage.getItem('selectedCurrency') || "USD";
+  // Получаем сохранённую валюту или используем RUB по умолчанию
+  let currentCurrency = localStorage.getItem('selectedCurrency') || "RUB";
   
   // Функция для обновления иконки кнопки
   function updateCurrencyButtonIcon() {
     if (toggleBtn) {
       const buttonContent = toggleBtn.querySelector('.tn-atom__button-content span');
       if (buttonContent) {
-        buttonContent.textContent = currentCurrency === "USD" ? "$" : "₽";
+        if (currentCurrency === "USD") {
+          buttonContent.textContent = "$";
+        } else if (currentCurrency === "EUR") {
+          buttonContent.textContent = "€";
+        } else {
+          buttonContent.textContent = "₽";
+        }
       } else {
         // Если структура другая, обновляем напрямую
-        toggleBtn.textContent = currentCurrency === "USD" ? "$" : "₽";
+        if (currentCurrency === "USD") {
+          toggleBtn.textContent = "$";
+        } else if (currentCurrency === "EUR") {
+          toggleBtn.textContent = "€";
+        } else {
+          toggleBtn.textContent = "₽";
+        }
       }
     }
   }
@@ -588,7 +600,7 @@ alt='' imgfield='tn_img_1751465164379'
 
   async function fetchCurrencyRates() {
     try {
-      const res = await fetch("https://neverend.travel/api/currencies", { 
+      const res = await fetch("/api/currencies", { 
         cache: "no-store" 
       });
       if (!res.ok) throw new Error("Ошибка загрузки курсов");
@@ -637,16 +649,27 @@ alt='' imgfield='tn_img_1751465164379'
         if (currentCurrency === "USD" && usdRate) {
           priceValue = Math.round(priceRub / usdRate);
           symbol = "$";
+        } else if (currentCurrency === "EUR" && eurRate) {
+          priceValue = Math.round(priceRub / eurRate);
+          symbol = "€";
         } else {
           priceValue = priceRub;
           symbol = "₽";
         }
       } else if (usd) {
         // Старая логика для статических элементов
-        priceValue = currentCurrency === "RUB" && usdRate
-          ? Math.round(usd * usdRate)
-          : usd;
-        symbol = currentCurrency === "USD" ? "$" : "₽";
+        if (currentCurrency === "USD") {
+          priceValue = usd;
+          symbol = "$";
+        } else if (currentCurrency === "EUR" && usdRate && eurRate) {
+          // Конвертируем USD -> RUB -> EUR
+          const rub = usd * usdRate;
+          priceValue = Math.round(rub / eurRate);
+          symbol = "€";
+        } else {
+          priceValue = usdRate ? Math.round(usd * usdRate) : usd;
+          symbol = "₽";
+        }
       }
       
       if (!priceValue) return;
@@ -663,21 +686,33 @@ alt='' imgfield='tn_img_1751465164379'
       if (!eur) return;
 
       const hasOt = el.textContent.includes("от");
-      const newValue = currentCurrency === "RUB" && eurRate
-        ? Math.round(eur * eurRate)
-        : eur;
+      let newValue = eur;
+      let symbol = "€";
+      
+      if (currentCurrency === "RUB" && eurRate) {
+        newValue = Math.round(eur * eurRate);
+        symbol = "₽";
+      } else if (currentCurrency === "USD" && eurRate && usdRate) {
+        // Конвертируем EUR -> RUB -> USD
+        const rub = eur * eurRate;
+        newValue = Math.round(rub / usdRate);
+        symbol = "$";
+      }
+      
       const formatted = formatPrice(newValue);
-      const symbol = currentCurrency === "USD" ? "€" : "₽";
-
       el.textContent = hasOt ? `от ${formatted}${symbol}` : `${formatted}${symbol}`;
     });
 
     // Обновляем кнопку переключения - меняем иконку
     updateCurrencyButtonIcon();
 
-    // Обновляем курс обмена (исходная логика)
+    // Обновляем курс обмена
     document.querySelectorAll(".exchangeRate .tn-atom").forEach(el => {
-      if (usdRate) el.textContent = `1$ = ${usdRate} ₽`;
+      if (usdRate && eurRate) {
+        el.textContent = `1$ = ${usdRate} ₽ | 1€ = ${eurRate} ₽`;
+      } else if (usdRate) {
+        el.textContent = `1$ = ${usdRate} ₽`;
+      }
     });
   }
 
@@ -693,10 +728,16 @@ alt='' imgfield='tn_img_1751465164379'
   // Восстанавливаем сохранённую валюту и обновляем цены
   updatePrices();
 
-  // Обработчик переключения валюты (только USD/RUB)
+  // Обработчик переключения валюты (циклическое: RUB -> USD -> EUR -> RUB)
   if (toggleBtn) {
     toggleBtn.addEventListener("click", () => {
-      currentCurrency = currentCurrency === "USD" ? "RUB" : "USD";
+      if (currentCurrency === "RUB") {
+        currentCurrency = "USD";
+      } else if (currentCurrency === "USD") {
+        currentCurrency = "EUR";
+      } else {
+        currentCurrency = "RUB";
+      }
       
       // Сохраняем выбор в localStorage
       localStorage.setItem('selectedCurrency', currentCurrency);

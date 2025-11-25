@@ -450,17 +450,20 @@ class Tour {
         
         // Добавляем новые цены
         if (prices && prices.length > 0) {
-          const stmt = db.prepare('INSERT INTO tour_prices (tour_id, price, description, price_order) VALUES (?, ?, ?, ?)');
+          const stmt = db.prepare('INSERT INTO tour_prices (tour_id, price, currency, description, price_order) VALUES (?, ?, ?, ?, ?)');
           let completed = 0;
           let hasError = false;
           
           prices.forEach((priceItem, index) => {
             if (priceItem.price !== undefined && priceItem.price !== null) {
               const price = parseInt(priceItem.price);
+              const currency = priceItem.currency && ['RUB', 'USD', 'EUR'].includes(priceItem.currency) 
+                ? priceItem.currency 
+                : 'RUB';
               const description = priceItem.description ? priceItem.description.trim() : null;
               const priceOrder = priceItem.price_order !== undefined ? parseInt(priceItem.price_order) : index;
               
-              stmt.run([tourId, price, description, priceOrder], (err) => {
+              stmt.run([tourId, price, currency, description, priceOrder], (err) => {
                 if (err && !hasError) {
                   hasError = true;
                   reject(err);

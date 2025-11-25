@@ -12,6 +12,7 @@ const subscriptionRoutes = require('./subscriptions.routes');
 const analyticsRoutes = require('./analytics.routes');
 const imageRoutes = require('./images.routes');
 const healthRoutes = require('./health.routes');
+const currenciesRoutes = require('./currencies.routes');
 
 // Health check (публичный, без rate limiting)
 router.use('/health', healthRoutes);
@@ -36,6 +37,9 @@ router.use('/analytics', analyticsRoutes);
 
 // Роут для расширенной статистики (используется в админ-панели)
 router.use('/stats', require('./stats.routes'));
+
+// Роуты курсов валют (публичные)
+router.use('/currencies', currenciesRoutes);
 
 module.exports = router;
 

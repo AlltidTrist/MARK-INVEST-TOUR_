@@ -175,6 +175,7 @@ function createTables() {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         tour_id INTEGER NOT NULL,
         price INTEGER NOT NULL,
+        currency TEXT DEFAULT 'RUB' CHECK(currency IN ('RUB', 'USD', 'EUR')),
         description TEXT,
         price_order INTEGER DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -199,6 +200,7 @@ function createTables() {
         if (completed === tables.length && !hasError) {
           // Добавляем новые поля в существующую таблицу, если их еще нет
           addColumnsIfNotExists()
+            .then(() => addCurrencyColumnToPrices())
             .then(() => createDefaultAdmin())
             .then(() => resolve())
             .catch(reject);
@@ -250,6 +252,31 @@ function addProgramImageColumn() {
         logger.log('Поле image_url добавлено в tour_programs (или уже существует)');
       }
       resolve();
+    });
+  });
+}
+
+/**
+ * Добавление поля currency в таблицу tour_prices
+ * @returns {Promise<void>}
+ */
+function addCurrencyColumnToPrices() {
+  return new Promise((resolve) => {
+    db.run("ALTER TABLE tour_prices ADD COLUMN currency TEXT DEFAULT 'RUB' CHECK(currency IN ('RUB', 'USD', 'EUR'))", (err) => {
+      if (err && !err.message.includes('duplicate column') && !err.message.includes('already exists')) {
+        // Если CHECK constraint не поддерживается при ALTER TABLE, добавляем только колонку
+        db.run("ALTER TABLE tour_prices ADD COLUMN currency TEXT DEFAULT 'RUB'", (err2) => {
+          if (err2 && !err2.message.includes('duplicate column') && !err2.message.includes('already exists')) {
+            logger.error('Ошибка добавления поля currency в tour_prices:', err2.message);
+          } else {
+            logger.log('Поле currency добавлено в tour_prices (или уже существует)');
+          }
+          resolve();
+        });
+      } else {
+        logger.log('Поле currency добавлено в tour_prices (или уже существует)');
+        resolve();
+      }
     });
   });
 }
