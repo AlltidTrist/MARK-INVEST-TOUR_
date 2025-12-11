@@ -297,17 +297,14 @@ function displayTourData(tour) {
             priceContainer.className = 'tour-price tour-price-multiple';
             console.log('Цены установлены, количество:', tour.prices.length);
         } else if (tour.price) {
-            // Используем базовую цену для обратной совместимости
-            priceContainer.dataset.priceRub = tour.price;
-            
-            // Получаем сохранённую валюту или используем RUB по умолчанию
-            const currentCurrency = localStorage.getItem('tourSelectedCurrency') || 'RUB';
+            // Цена уже в евро, показываем как есть
+            priceContainer.dataset.priceEur = tour.price;
             
             // Обновляем отображение цены
             if (typeof updateTourPrice === 'function') {
-                updateTourPrice(priceContainer, tour.price, currentCurrency);
+                updateTourPrice(priceContainer, tour.price, 'EUR');
             } else {
-                priceContainer.textContent = tour.price.toLocaleString('ru-RU') + ' ₽';
+                priceContainer.textContent = `от ${tour.price.toLocaleString('ru-RU')}€`;
             }
             
             priceContainer.style.display = 'block';
@@ -404,50 +401,6 @@ function displayTourData(tour) {
             `);
         }
         
-        // Добавляем включения/исключения в детали
-        if (tour.inclusions && tour.inclusions.length > 0) {
-            const included = tour.inclusions.filter(inc => inc.type === 'included');
-            const excluded = tour.inclusions.filter(inc => inc.type === 'excluded');
-            
-            if (included.length > 0) {
-                const includedItems = included.map(inc => `
-                    <li class="tour-inclusion-item tour-inclusion-item-included">
-                        <svg class="tour-inclusion-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M16.7071 5.29289C17.0976 5.68342 17.0976 6.31658 16.7071 6.70711L8.70711 14.7071C8.31658 15.0976 7.68342 15.0976 7.29289 14.7071L3.29289 10.7071C2.90237 10.3166 2.90237 9.68342 3.29289 9.29289C3.68342 8.90237 4.31658 8.90237 4.70711 9.29289L8 12.5858L15.2929 5.29289C15.6834 4.90237 16.3166 4.90237 16.7071 5.29289Z" fill="currentColor"/>
-                        </svg>
-                        <span>${inc.item}</span>
-                    </li>
-                `).join('');
-                details.push(`
-                    <div class="tour-detail-item tour-detail-item-full tour-inclusions-wrapper">
-                        <div class="tour-detail-label tour-inclusions-label">Что входит в тур</div>
-                        <ul class="tour-inclusions-list tour-inclusions-list-included">
-                            ${includedItems}
-                        </ul>
-                    </div>
-                `);
-            }
-            
-            if (excluded.length > 0) {
-                const excludedItems = excluded.map(inc => `
-                    <li class="tour-inclusion-item tour-inclusion-item-excluded">
-                        <svg class="tour-inclusion-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span>${inc.item}</span>
-                    </li>
-                `).join('');
-                details.push(`
-                    <div class="tour-detail-item tour-detail-item-full tour-inclusions-wrapper">
-                        <div class="tour-detail-label tour-inclusions-label">Не входит в тур</div>
-                        <ul class="tour-inclusions-list tour-inclusions-list-excluded">
-                            ${excludedItems}
-                        </ul>
-                    </div>
-                `);
-            }
-        }
-        
         if (details.length > 0) {
             detailsContainer.innerHTML = details.join('');
             detailsContainer.style.display = 'grid';
@@ -466,8 +419,11 @@ function displayTourData(tour) {
         console.error('Элемент tour-details не найден');
     }
     
-    // Программа тура
+    // Программа тура (расписание) - отображается первой
     displayTourPrograms(tour);
+    
+    // Включения/исключения - отображаются после программы тура
+    displayTourInclusions(tour);
     
     // Инициализация галереи изображений
     const galleryTitleEl = document.getElementById('tour-gallery-title');
@@ -513,6 +469,105 @@ function displayTourData(tour) {
     
     // Форма бронирования
     setupBookingForm(tour.id);
+}
+
+// Отображение включений/исключений тура
+function displayTourInclusions(tour) {
+    // Создаем или находим контейнер для включений/исключений
+    let inclusionsContainer = document.getElementById('tour-inclusions');
+    if (!inclusionsContainer) {
+        // Создаем новый контейнер после программы тура
+        const programsWrapper = document.querySelector('.tour-programs-wrapper');
+        if (programsWrapper) {
+            inclusionsContainer = document.createElement('div');
+            inclusionsContainer.id = 'tour-inclusions';
+            inclusionsContainer.className = 'tour-content-section';
+            inclusionsContainer.innerHTML = `
+                <div class="tour-container">
+                    <div class="tour-inclusions-section">
+                        <h2 class="tour-section-title" id="tour-inclusions-title" style="display: none;">Что входит и не входит</h2>
+                        <div id="tour-inclusions-content"></div>
+                    </div>
+                </div>
+            `;
+            // Вставляем после программы тура
+            programsWrapper.parentNode.insertBefore(inclusionsContainer, programsWrapper.nextSibling);
+        } else {
+            console.error('Не найден контейнер программы тура');
+            return;
+        }
+    }
+    
+    const contentContainer = document.getElementById('tour-inclusions-content');
+    const titleEl = document.getElementById('tour-inclusions-title');
+    
+    if (!contentContainer) {
+        console.error('Не найден контейнер для включений/исключений');
+        return;
+    }
+    
+    if (tour.inclusions && tour.inclusions.length > 0) {
+        const included = tour.inclusions.filter(inc => inc.type === 'included');
+        const excluded = tour.inclusions.filter(inc => inc.type === 'excluded');
+        
+        let inclusionsHTML = '';
+        
+        if (included.length > 0) {
+            const includedItems = included.map(inc => `
+                <li class="tour-inclusion-item tour-inclusion-item-included">
+                    <svg class="tour-inclusion-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16.7071 5.29289C17.0976 5.68342 17.0976 6.31658 16.7071 6.70711L8.70711 14.7071C8.31658 15.0976 7.68342 15.0976 7.29289 14.7071L3.29289 10.7071C2.90237 10.3166 2.90237 9.68342 3.29289 9.29289C3.68342 8.90237 4.31658 8.90237 4.70711 9.29289L8 12.5858L15.2929 5.29289C15.6834 4.90237 16.3166 4.90237 16.7071 5.29289Z" fill="currentColor"/>
+                    </svg>
+                    <span>${inc.item}</span>
+                </li>
+            `).join('');
+            inclusionsHTML += `
+                <div class="tour-inclusions-wrapper">
+                    <div class="tour-inclusions-label">Что входит в тур</div>
+                    <ul class="tour-inclusions-list tour-inclusions-list-included">
+                        ${includedItems}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        if (excluded.length > 0) {
+            const excludedItems = excluded.map(inc => `
+                <li class="tour-inclusion-item tour-inclusion-item-excluded">
+                    <svg class="tour-inclusion-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>${inc.item}</span>
+                </li>
+            `).join('');
+            inclusionsHTML += `
+                <div class="tour-inclusions-wrapper">
+                    <div class="tour-inclusions-label">Не входит в тур</div>
+                    <ul class="tour-inclusions-list tour-inclusions-list-excluded">
+                        ${excludedItems}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        if (inclusionsHTML) {
+            contentContainer.innerHTML = inclusionsHTML;
+            contentContainer.style.display = 'block';
+            if (titleEl) {
+                titleEl.style.display = 'block';
+            }
+        } else {
+            contentContainer.style.display = 'none';
+            if (titleEl) {
+                titleEl.style.display = 'none';
+            }
+        }
+    } else {
+        contentContainer.style.display = 'none';
+        if (titleEl) {
+            titleEl.style.display = 'none';
+        }
+    }
 }
 
 // Отображение программы тура
@@ -808,40 +863,12 @@ function showError(message) {
 }
 
 // Функция обновления цены тура
-async function updateTourPrice(priceContainer, priceRub, currency) {
-    if (!priceContainer || !priceRub) return;
+async function updateTourPrice(priceContainer, priceEur, currency) {
+    if (!priceContainer || !priceEur) return;
     
-    let displayPrice = priceRub;
-    let symbol = '₽';
-    
-    if (currency === 'USD' || currency === 'EUR') {
-        // Получаем курс валют
-        let usdRate = null;
-        let eurRate = null;
-        try {
-            const res = await fetch("/api/currencies", { 
-                cache: "no-store" 
-            });
-            if (res.ok) {
-                const data = await res.json();
-                usdRate = data.data?.usd || null;
-                eurRate = data.data?.eur || null;
-            }
-        } catch (err) {
-            console.warn("Курсы не получены:", err.message);
-            // Используем примерные курсы если API недоступен
-            usdRate = 95.0;
-            eurRate = 105.0;
-        }
-        
-        if (currency === 'USD' && usdRate) {
-            displayPrice = Math.round(priceRub / usdRate);
-            symbol = '$';
-        } else if (currency === 'EUR' && eurRate) {
-            displayPrice = Math.round(priceRub / eurRate);
-            symbol = '€';
-        }
-    }
+    // Цены уже в евро, показываем как есть
+    const displayPrice = priceEur;
+    const symbol = '€';
     
     const formattedPrice = displayPrice.toLocaleString('ru-RU', { 
         minimumFractionDigits: 0,
@@ -855,62 +882,15 @@ async function updateTourPrice(priceContainer, priceRub, currency) {
 async function updateTourPricesDisplay(priceContainer, prices) {
     if (!priceContainer || !prices || prices.length === 0) return;
     
-    const currentCurrency = localStorage.getItem('selectedCurrency') || 'RUB';
-    
-    // Получаем курсы валют
-    let usdRate = null;
-    let eurRate = null;
-    try {
-        const res = await fetch("/api/currencies", { 
-            cache: "no-store" 
-        });
-        if (res.ok) {
-            const data = await res.json();
-            usdRate = data.data?.usd || null;
-            eurRate = data.data?.eur || null;
-        }
-    } catch (err) {
-        console.warn("Курсы не получены:", err.message);
-        usdRate = 95.0;
-        eurRate = 105.0;
-    }
-    
+    // Цены уже в евро, показываем как есть
     const pricesHTML = prices.map(priceItem => {
         const price = priceItem.price || 0;
-        const currency = priceItem.currency || 'RUB';
+        const currency = priceItem.currency || 'EUR';
         const description = priceItem.description ? ` - ${priceItem.description}` : '';
         
-        let displayPrice = price;
-        let symbol = '₽';
-        
-        // Конвертируем цену в выбранную валюту
-        if (currentCurrency === 'USD' && currency === 'RUB' && usdRate) {
-            displayPrice = Math.round(price / usdRate);
-            symbol = '$';
-        } else if (currentCurrency === 'EUR' && currency === 'RUB' && eurRate) {
-            displayPrice = Math.round(price / eurRate);
-            symbol = '€';
-        } else if (currentCurrency === 'USD' && currency === 'EUR' && eurRate && usdRate) {
-            // Конвертируем EUR -> RUB -> USD
-            const rub = price * eurRate;
-            displayPrice = Math.round(rub / usdRate);
-            symbol = '$';
-        } else if (currentCurrency === 'EUR' && currency === 'USD' && usdRate && eurRate) {
-            // Конвертируем USD -> RUB -> EUR
-            const rub = price * usdRate;
-            displayPrice = Math.round(rub / eurRate);
-            symbol = '€';
-        } else if (currentCurrency === 'RUB' && currency === 'USD' && usdRate) {
-            displayPrice = Math.round(price * usdRate);
-            symbol = '₽';
-        } else if (currentCurrency === 'RUB' && currency === 'EUR' && eurRate) {
-            displayPrice = Math.round(price * eurRate);
-            symbol = '₽';
-        } else if (currency === 'USD') {
-            symbol = '$';
-        } else if (currency === 'EUR') {
-            symbol = '€';
-        }
+        // Все цены уже в евро, показываем как есть
+        const displayPrice = price;
+        const symbol = '€';
         
         const formattedPrice = displayPrice.toLocaleString('ru-RU');
         return `<div class="tour-price-item" data-price-currency="${currency}" data-price-value="${price}">${formattedPrice}${symbol}${description}</div>`;

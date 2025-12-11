@@ -16,6 +16,7 @@ validateEnv();
 // Импорт конфигурации
 const { initDatabase } = require('./server/config/database');
 const { initRedis } = require('./server/config/redis');
+const { imagesStoragePath } = require('./server/config/storage');
 const { apiLimiter } = require('./server/middleware/rateLimit.middleware');
 const { errorHandler, notFoundHandler } = require('./server/middleware/error.middleware');
 const { requestLogger } = require('./server/middleware/logger.middleware');
@@ -60,6 +61,10 @@ app.use(requestLogger); // Логирование запросов
 app.use('/api/', apiLimiter);
 
 // Статические файлы
+app.use('/assets/images', express.static(imagesStoragePath, {
+  maxAge: '1d',
+  etag: true
+}));
 app.use('/assets', express.static(path.join(__dirname, 'assets'), {
   maxAge: '1d',
   etag: true

@@ -85,6 +85,12 @@ body.brand-theme .t-body {
 
 }
 
+/* Контент всегда видим - убрано скрытие для предотвращения черного экрана */
+body.brand-theme #allrecords {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
 
 
 body.brand-theme ::selection {
@@ -224,6 +230,11 @@ body.brand-theme .language-switcher--fixed button.active {
 }
 
 
+
+/* Кнопка переключения валюты скрыта - используется только EUR */
+body.brand-theme .currencyToggle {
+    display: none !important;
+}
 
 body.brand-theme .currencyToggle .tn-atom,
 
@@ -2073,6 +2084,11 @@ body.brand-theme #rec1084501546 .t-slds__bullet:hover .t-slds__bullet_body {
   display: contents !important;
 }
 
+/* Скрываем статические карточки при загрузке, чтобы они не появлялись на секунду */
+#rec1170228026 .travelCard:not([data-dynamic-card="true"]) {
+    display: none !important;
+}
+
 /* Новые карточки туров в стиле сайта */
 #rec1170228026 .travelCard[data-dynamic-card="true"] {
   position: relative !important;
@@ -2130,7 +2146,11 @@ body.brand-theme #rec1084501546 .t-slds__bullet:hover .t-slds__bullet_body {
 }
 
 #rec1170228026 .travelCard[data-dynamic-card="true"] .tour-card-date {
-  color: rgba(255, 255, 255, 0.5) !important;
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    color: var(--mark-white) !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
 }
 
 #rec1170228026 .travelCard[data-dynamic-card="true"] .tour-card-separator {
@@ -2138,7 +2158,10 @@ body.brand-theme #rec1084501546 .t-slds__bullet:hover .t-slds__bullet_body {
 }
 
 #rec1170228026 .travelCard[data-dynamic-card="true"] .tour-card-price {
-  color: rgba(255, 255, 255, 0.5) !important;
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    color: var(--mark-red) !important;
+    letter-spacing: 0.02em !important;
 }
 
 /* Название тура */
@@ -2306,5 +2329,43 @@ body.brand-theme #rec1084501546 .t-slds__bullet:hover .t-slds__bullet_body {
     padding: 0 !important;
     margin: 0 !important;
   }
+}
+
+/* Исправление перекрытия формы заявки и контактов в футере */
+/* Группа формы подписки - добавляем отступ снизу для предотвращения перекрытия */
+#rec1058341366 .tn-group[data-group-id="174829168366758540"] {
+    padding-bottom: 60px !important;
+    margin-bottom: 0 !important;
+}
+
+/* Элемент контактов - сдвигаем ниже группы формы, чтобы не перекрывался */
+/* Форма начинается на top:68px и имеет height:233px (но может быть больше из-за hug), 
+   поэтому контакты должны быть минимум на 68+233+60=361px, ставим 380px для надежности */
+#rec1058341366 .tn-elem[data-elem-id="175283113333445042"] {
+    top: 380px !important; /* Было 340px, увеличиваем на 40px для отступа */
+}
+
+@media screen and (max-width: 1199px) {
+    /* На планшетах форма выше (height:465px), сдвигаем контакты еще ниже */
+    /* Форма на top:68px + height:465px + отступ 50px = минимум 583px */
+    #rec1058341366 .tn-group[data-group-id="174829168366758540"] {
+        padding-bottom: 50px !important;
+    }
+    
+    #rec1058341366 .tn-elem[data-elem-id="175283113333445042"] {
+        top: 600px !important; /* Было 530px, увеличиваем на 70px */
+    }
+}
+
+@media screen and (max-width: 639px) {
+    /* На мобильных форма тоже выше (height:410px), сдвигаем контакты ниже */
+    /* Форма на top:68px + height:410px + отступ 40px = минимум 518px */
+    #rec1058341366 .tn-group[data-group-id="174829168366758540"] {
+        padding-bottom: 40px !important;
+    }
+    
+    #rec1058341366 .tn-elem[data-elem-id="175283113333445042"] {
+        top: 560px !important; /* Было 500px, увеличиваем на 60px */
+    }
 }
 

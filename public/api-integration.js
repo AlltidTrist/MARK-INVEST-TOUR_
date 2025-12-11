@@ -641,15 +641,15 @@ function createTravelCard(tour) {
     let minPrice = null;
     
     if (tour.prices && tour.prices.length > 0) {
-        // Находим минимальную цену из всех цен
+        // Находим минимальную цену из всех цен (цены уже в евро)
         minPrice = Math.min(...tour.prices.map(p => p.price || 0));
         if (minPrice > 0) {
-            priceText = `${fromText} ${minPrice.toLocaleString('ru-RU')} ₽`;
+            priceText = `${fromText} ${minPrice.toLocaleString('ru-RU')}€`;
         }
     } else if (tour.price) {
-        // Используем базовую цену для обратной совместимости
+        // Цена уже в евро, показываем как есть
         minPrice = tour.price;
-        priceText = `${fromText} ${tour.price.toLocaleString('ru-RU')} ₽`;
+        priceText = `${fromText} ${tour.price.toLocaleString('ru-RU')}€`;
     }
     
     // Получаем URL изображения (абсолютный путь)

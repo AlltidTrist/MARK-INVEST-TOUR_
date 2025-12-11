@@ -129,10 +129,10 @@
             if (CurrencyUtils && CurrencyUtils.formatPrice) {
                 return CurrencyUtils.formatPrice(this.tour.price);
             }
-            // Fallback
+            // Fallback - цены уже в евро
             const translations = window.i18n && window.i18n.getTranslations ? window.i18n.getTranslations() : {};
             const fromText = translations.common?.from || 'от';
-            return this.tour.price ? `${fromText} ${this.tour.price.toLocaleString('ru-RU')} ₽` : '';
+            return this.tour.price ? `${fromText} ${this.tour.price.toLocaleString('ru-RU')}€` : '';
         }
 
         /**

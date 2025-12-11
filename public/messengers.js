@@ -26,12 +26,19 @@ function initMessengerButtons() {
     style.textContent = `
       .messenger-buttons {
         position: fixed;
-        bottom: 20px;
+        bottom: 100px;
         right: 20px;
         z-index: 1000;
         display: flex;
         flex-direction: column;
         gap: 12px;
+      }
+      
+      @media (max-width: 768px) {
+        .messenger-buttons {
+          bottom: 120px;
+          right: 16px;
+        }
       }
       
       .messenger-button {

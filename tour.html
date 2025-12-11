@@ -1131,7 +1131,6 @@
           <img src="/assets/images/ne_logo.svg" alt="MARK INVEST TOUR" />
         </a>
         <div class="tour-hero-right">
-          <button class="tour-hero-button" id="currency-toggle" title="Переключить валюту">$</button>
           <button class="tour-hero-button" id="chat-button" title="Связаться с нами">
             <svg width="20" height="20" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M9.25 6.25H14.75C15.578 6.25 16.25 6.922 16.25 7.75V16.25L13.5 13.75H9.25C8.422 13.75 7.75 13.078 7.75 12.25V7.75C7.75 6.922 8.422 6.25 9.25 6.25Z" fill="currentColor" fill-opacity="0.3"/>
@@ -1200,6 +1199,14 @@
           </div>
         </div>
       </div>
+      <div class="tour-content-section" id="tour-inclusions" style="display: none;">
+        <div class="tour-container">
+          <div class="tour-inclusions-section">
+            <h2 class="tour-section-title" id="tour-inclusions-title" style="display: none;">Что входит и не входит</h2>
+            <div id="tour-inclusions-content"></div>
+          </div>
+        </div>
+      </div>
       <div class="tour-container">
         <div class="tour-booking">
           <h2 class="tour-booking-title">Забронировать тур</h2>
@@ -1243,46 +1250,7 @@
         lastScrollTop = scrollTop;
       });
       
-      // Кнопка переключения валюты
-      const currencyToggle = document.getElementById('currency-toggle');
-      
-      if (currencyToggle) {
-        // Получаем сохранённую валюту или используем RUB по умолчанию
-        let currentCurrency = localStorage.getItem('tourSelectedCurrency') || 'RUB';
-        
-        // Функция для обновления иконки и цены
-        const updateCurrencyDisplay = async () => {
-          // Обновляем иконку кнопки
-          currencyToggle.textContent = currentCurrency === 'USD' ? '$' : '₽';
-          
-          // Обновляем цену, если она уже загружена
-          const priceContainer = document.getElementById('tour-price');
-          if (priceContainer && priceContainer.dataset.priceRub) {
-            const priceRub = parseFloat(priceContainer.dataset.priceRub);
-            if (typeof updateTourPrice === 'function') {
-              await updateTourPrice(priceContainer, priceRub, currentCurrency);
-            }
-          }
-        };
-        
-        // Устанавливаем начальную иконку после небольшой задержки, чтобы данные тура успели загрузиться
-        setTimeout(() => {
-          updateCurrencyDisplay();
-        }, 500);
-        
-        currencyToggle.addEventListener('click', async () => {
-          // Переключаем валюту
-          currentCurrency = currentCurrency === 'USD' ? 'RUB' : 'USD';
-          
-          // Сохраняем выбор в localStorage
-          localStorage.setItem('tourSelectedCurrency', currentCurrency);
-          
-          // Обновляем отображение
-          await updateCurrencyDisplay();
-          
-          console.log('Валюта переключена на:', currentCurrency);
-        });
-      }
+      // Валюта всегда EUR, переключение не требуется
       
       // Кнопка чата
       const chatButton = document.getElementById('chat-button');

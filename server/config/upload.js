@@ -5,6 +5,7 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { imagesStoragePath, ensureDirExists } = require('./storage');
 
 /**
  * Фильтр файлов - разрешены только изображения
@@ -24,11 +25,8 @@ const fileFilter = (req, file, cb) => {
 /**
  * Создание папки для изображений, если её нет
  */
-const imagesDir = path.join(__dirname, '../../assets/images');
-if (!fs.existsSync(imagesDir)) {
-  fs.mkdirSync(imagesDir, { recursive: true });
-  console.log('Создана папка для изображений:', imagesDir);
-}
+const imagesDir = imagesStoragePath;
+ensureDirExists(imagesDir);
 
 /**
  * Настройка хранилища для загруженных файлов
@@ -36,9 +34,7 @@ if (!fs.existsSync(imagesDir)) {
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     // Убеждаемся, что папка существует
-    if (!fs.existsSync(imagesDir)) {
-      fs.mkdirSync(imagesDir, { recursive: true });
-    }
+    ensureDirExists(imagesDir);
     cb(null, imagesDir);
   },
   filename: function (req, file, cb) {

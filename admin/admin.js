@@ -290,18 +290,10 @@ function addPriceField() {
             <div class="price-item-title">Цена ${priceIndex + 1}</div>
             <button type="button" class="btn-remove-price" onclick="removePriceField(${priceIndex})">Удалить</button>
         </div>
-        <div class="price-item-row" style="display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 12px;">
+        <div class="price-item-row" style="display: grid; grid-template-columns: 1fr 2fr; gap: 12px;">
             <div class="form-group">
-                <label class="form-label" for="price_value_${priceIndex}">Цена</label>
+                <label class="form-label" for="price_value_${priceIndex}">Цена (€)</label>
                 <input type="number" id="price_value_${priceIndex}" class="form-input" placeholder="Введите цену" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="price_currency_${priceIndex}">Валюта</label>
-                <select id="price_currency_${priceIndex}" class="form-select">
-                    <option value="RUB">₽ RUB</option>
-                    <option value="USD">$ USD</option>
-                    <option value="EUR">€ EUR</option>
-                </select>
             </div>
             <div class="form-group">
                 <label class="form-label" for="price_description_${priceIndex}">Описание</label>
@@ -528,13 +520,12 @@ async function handleTourSubmit(e) {
     priceItems.forEach((item, index) => {
         const priceIndex = item.dataset.priceIndex;
         const priceInput = document.getElementById(`price_value_${priceIndex}`);
-        const currencyInput = document.getElementById(`price_currency_${priceIndex}`);
         const descriptionInput = document.getElementById(`price_description_${priceIndex}`);
         
         if (priceInput && priceInput.value) {
             prices.push({
                 price: parseInt(priceInput.value),
-                currency: currencyInput ? currencyInput.value : 'RUB',
+                currency: 'EUR', // Всегда используем EUR
                 description: descriptionInput ? descriptionInput.value.trim() : null,
                 price_order: index
             });
@@ -711,7 +702,15 @@ async function loadTours() {
                             ${tour.location || ''} ${tour.location && tour.duration ? '•' : ''} ${tour.duration || ''}
                         </p>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
-                            ${tour.price ? `<p style="color: rgba(255,255,255,0.9); font-size: 18px; font-weight: 600; margin: 0;">${parseInt(tour.price).toLocaleString('ru-RU')} ₽</p>` : '<p style="color: rgba(255,255,255,0.4); font-size: 14px; margin: 0;">Цена не указана</p>'}
+                            ${(() => {
+                                let displayPrice = null;
+                                if (tour.prices && tour.prices.length > 0) {
+                                    displayPrice = Math.min(...tour.prices.map(p => p.price || 0));
+                                } else if (tour.price) {
+                                    displayPrice = tour.price;
+                                }
+                                return displayPrice ? `<p style="color: rgba(255,255,255,0.9); font-size: 18px; font-weight: 600; margin: 0;">${parseInt(displayPrice).toLocaleString('ru-RU')} €</p>` : '<p style="color: rgba(255,255,255,0.4); font-size: 14px; margin: 0;">Цена не указана</p>';
+                            })()}
                             ${tour.status ? `<span style="display: inline-block; padding: 4px 12px; background-color: ${tour.status === 'active' ? 'rgba(76, 175, 80, 0.2)' : 'rgba(158, 158, 158, 0.2)'}; color: ${tour.status === 'active' ? '#4CAF50' : '#9E9E9E'}; border-radius: 8px; font-size: 12px; font-weight: 500;">
                                 ${tour.status === 'active' ? 'Активный' : 'Неактивный'}
                             </span>` : ''}
@@ -739,7 +738,15 @@ async function loadTours() {
                             <p style="color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 6px;">
                                 ${tour.location || ''} ${tour.location && tour.duration ? '•' : ''} ${tour.duration || ''}
                             </p>
-                            ${tour.price ? `<p style="color: rgba(255,255,255,0.8); font-size: 16px; font-weight: 500; margin-bottom: 6px;">${parseInt(tour.price).toLocaleString('ru-RU')} ₽</p>` : ''}
+                            ${(() => {
+                                let displayPrice = null;
+                                if (tour.prices && tour.prices.length > 0) {
+                                    displayPrice = Math.min(...tour.prices.map(p => p.price || 0));
+                                } else if (tour.price) {
+                                    displayPrice = tour.price;
+                                }
+                                return displayPrice ? `<p style="color: rgba(255,255,255,0.8); font-size: 16px; font-weight: 500; margin-bottom: 6px;">${parseInt(displayPrice).toLocaleString('ru-RU')} €</p>` : '';
+                            })()}
                             ${tour.status ? `<p style="display: inline-block; padding: 4px 12px; background-color: ${tour.status === 'active' ? 'rgba(76, 175, 80, 0.2)' : 'rgba(158, 158, 158, 0.2)'}; color: ${tour.status === 'active' ? '#4CAF50' : '#9E9E9E'}; border-radius: 8px; font-size: 12px; font-weight: 500;">
                                 ${tour.status === 'active' ? 'Активный' : 'Неактивный'}
                             </p>` : ''}
@@ -891,24 +898,15 @@ async function editTour(id) {
                 priceItem.className = 'price-item';
                 priceItem.dataset.priceIndex = priceIndex;
                 
-                const currency = price.currency || 'RUB';
                 priceItem.innerHTML = `
                     <div class="price-item-header">
                         <div class="price-item-title">Цена ${priceIndex + 1}</div>
                         <button type="button" class="btn-remove-price" onclick="removePriceField(${priceIndex})">Удалить</button>
                     </div>
-                    <div class="price-item-row" style="display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 12px;">
+                    <div class="price-item-row" style="display: grid; grid-template-columns: 1fr 2fr; gap: 12px;">
                         <div class="form-group">
-                            <label class="form-label" for="price_value_${priceIndex}">Цена</label>
+                            <label class="form-label" for="price_value_${priceIndex}">Цена (€)</label>
                             <input type="number" id="price_value_${priceIndex}" class="form-input" placeholder="Введите цену" value="${price.price || ''}" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="price_currency_${priceIndex}">Валюта</label>
-                            <select id="price_currency_${priceIndex}" class="form-select">
-                                <option value="RUB" ${currency === 'RUB' ? 'selected' : ''}>₽ RUB</option>
-                                <option value="USD" ${currency === 'USD' ? 'selected' : ''}>$ USD</option>
-                                <option value="EUR" ${currency === 'EUR' ? 'selected' : ''}>€ EUR</option>
-                            </select>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="price_description_${priceIndex}">Описание</label>

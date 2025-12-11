@@ -36,8 +36,13 @@
    ```bash
    # В Railway Dashboard:
    # Settings -> Volumes -> Create Volume
-   # Mount path: /app/assets/images
+   # Mount path: /mnt/volume/your-id
    ```
+   Затем добавьте переменную окружения:
+   ```
+   IMAGES_PATH=/mnt/volume/your-id/images
+   ```
+   или смонтируйте Volume напрямую в `/app/assets/images`.
 
 2. **Использовать внешнее хранилище** (S3, Cloudinary):
    - Настройте переменные окружения для S3 или Cloudinary

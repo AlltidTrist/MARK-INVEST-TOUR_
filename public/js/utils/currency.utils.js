@@ -6,16 +6,17 @@
 (function() {
     'use strict';
 
-    // Глобальное состояние валюты
-    let currentCurrency = 'RUB';
+    // Глобальное состояние валюты - всегда EUR
+    let currentCurrency = 'EUR';
 
     /**
-     * Установить текущую валюту
-     * @param {string} currency - Код валюты (RUB, USD)
+     * Установить текущую валюту (не используется, всегда EUR)
+     * @param {string} currency - Код валюты
      */
     function setCurrency(currency) {
-        currentCurrency = currency;
-        window.currentCurrency = currency;
+        // Всегда используем EUR
+        currentCurrency = 'EUR';
+        window.currentCurrency = 'EUR';
     }
 
     /**
@@ -23,29 +24,21 @@
      * @returns {string}
      */
     function getCurrency() {
-        return currentCurrency;
+        return 'EUR';
     }
 
     /**
-     * Форматировать цену с учетом валюты
-     * @param {number} price - Цена в рублях
-     * @param {string} [currency] - Код валюты (если не указан, используется текущая)
+     * Форматировать цену (цены уже в евро)
+     * @param {number} price - Цена в евро
+     * @param {string} [currency] - Игнорируется, всегда используется EUR
      * @returns {string} Отформатированная цена
      */
     function formatPrice(price, currency = null) {
         if (!price) return '';
         
-        const curr = currency || currentCurrency;
+        // Цены уже в евро, показываем как есть
         const priceNum = parseInt(price);
-        
-        if (curr === 'USD') {
-            // Примерный курс (можно получать из API)
-            const exchangeRate = window.exchangeRate || 101.23;
-            const usdPrice = Math.round(priceNum / exchangeRate);
-            return `от ${usdPrice.toLocaleString('ru-RU')} $`;
-        } else {
-            return `от ${priceNum.toLocaleString('ru-RU')} ₽`;
-        }
+        return `от ${priceNum.toLocaleString('ru-RU')}€`;
     }
 
     // Экспорт в глобальный объект

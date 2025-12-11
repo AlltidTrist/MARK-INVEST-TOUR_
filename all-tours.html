@@ -432,7 +432,6 @@
         <img src="/assets/images/ne_logo.svg" alt="MARK INVEST TOUR" />
       </a>
       <div class="tour-hero-right">
-        <button class="tour-hero-button" id="currency-toggle" title="Переключить валюту">$</button>
         <button class="tour-hero-button" id="chat-button" title="Связаться с нами">
           <svg width="20" height="20" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M9.25 6.25H14.75C15.578 6.25 16.25 6.922 16.25 7.75V16.25L13.5 13.75H9.25C8.422 13.75 7.75 13.078 7.75 12.25V7.75C7.75 6.922 8.422 6.25 9.25 6.25Z" fill="currentColor" fill-opacity="0.3"/>
@@ -583,7 +582,7 @@
           if (gridEl) {
             gridEl.innerHTML = sortedTours.map(tour => {
               const imageUrl = tour.image_url || '/assets/images/hero_background_new.jpg';
-              const price = tour.price ? parseInt(tour.price).toLocaleString('ru-RU') + ' ₽' : 'Цена по запросу';
+              const price = tour.price ? `от ${parseInt(tour.price).toLocaleString('ru-RU')}€` : 'Цена по запросу';
               const dateText = tour.date_start ? new Date(tour.date_start).toLocaleDateString('ru-RU') : '';
 
               return `
@@ -677,26 +676,7 @@
         });
       }
 
-      // Кнопка переключения валюты
-      const currencyToggle = document.getElementById('currency-toggle');
-      if (currencyToggle) {
-        let currentCurrency = localStorage.getItem('selectedCurrency') || 'RUB';
-        
-        const updateCurrencyDisplay = () => {
-          currencyToggle.textContent = currentCurrency === 'USD' ? '$' : '₽';
-          if (typeof window.updateCurrencyPrices === 'function') {
-            window.updateCurrencyPrices();
-          }
-        };
-        
-        updateCurrencyDisplay();
-        
-        currencyToggle.addEventListener('click', () => {
-          currentCurrency = currentCurrency === 'USD' ? 'RUB' : 'USD';
-          localStorage.setItem('selectedCurrency', currentCurrency);
-          updateCurrencyDisplay();
-        });
-      }
+      // Валюта всегда EUR, переключение не требуется
 
       // Кнопка чата
       const chatButton = document.getElementById('chat-button');
